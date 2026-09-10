@@ -14,7 +14,6 @@ create type user_role as enum (
   'interpreter',
   'coordinator',
   'admin',
-  'partner_admin'
 );
 
 create type user_status as enum (
