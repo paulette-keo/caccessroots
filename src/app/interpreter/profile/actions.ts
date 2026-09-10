@@ -167,9 +167,7 @@ export async function saveInterpreterProfileAction(
     ) === "on";
 
   const is_advanced_itp_student =
-  formData.get(
-    "is_advanced_itp_student"
-  ) === "on";
+    formData.get("is_advanced_itp_student") === "yes";
 
 const college_name = is_advanced_itp_student
   ? String(
