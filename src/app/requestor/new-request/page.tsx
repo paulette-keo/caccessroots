@@ -20,7 +20,7 @@ export default function NewRequestPage() {
         action={createRequestAction}
         className="card p-6 space-y-4 mt-6"
       >
-        <div className="rounded-xl border-l-4 border-[#DB1F26] bg-[#FCEBEC] p-4 text-sm leading-relaxed text-[#374151]">
+        <div className="rounded-xl border-l-4 border-[#2F6B4F] bg-[#EDF7F1] p-4 text-sm leading-relaxed text-[#374151]">
           <p className="font-semibold text-[#0A0D12]">
             Platform disclaimer
           </p>

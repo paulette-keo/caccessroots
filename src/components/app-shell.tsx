@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { Profile, UserRole } from "@/lib/types";
 import SignOutButton from "./sign-out-button";
+import { Wordmark } from "./wordmark";
 
 const NAV: Record<UserRole, { href: string; label: string }[]> = {
   requestor: [
@@ -52,21 +52,14 @@ export default function AppShell({
     <div className="min-h-screen bg-[#FAFAFA]">
       <header className={HEADER_TONE[profile.role]}>
         <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between gap-4">
-          {/* LOGO + ROLE */}
+          {/* BRAND + ROLE */}
           <Link
             href="/dashboard"
             className="flex items-center gap-3 shrink-0"
           >
-            <Image
-              src="/applied-development-logo.png"
-              alt="Applied Development"
-              width={200}
-              height={80}
-              className="h-10 w-auto object-contain sm:h-11"
-              priority
-            />
+            <Wordmark size="md" href={null} />
 
-            <span className="badge ml-1 capitalize bg-[#FCEBEC] text-[#DB1F26]">
+            <span className="badge ml-1 capitalize bg-brand-50 text-brand-700">
               {profile.role.replace("_", " ")}
             </span>
           </Link>
@@ -80,7 +73,7 @@ export default function AppShell({
               <Link
                 key={item.href}
                 href={item.href}
-                className="px-3 py-2 rounded-lg text-sm font-medium text-[#374151] transition hover:text-[#DB1F26] hover:bg-[#FCEBEC]"
+                className="px-3 py-2 rounded-lg text-sm font-medium text-[#374151] transition hover:text-brand-700 hover:bg-brand-50"
               >
                 {item.label}
               </Link>
@@ -107,7 +100,7 @@ export default function AppShell({
               <Link
                 key={item.href}
                 href={item.href}
-                className="px-3 py-2 rounded-lg text-sm font-medium text-[#374151] transition hover:text-[#DB1F26] hover:bg-[#FCEBEC]"
+                className="px-3 py-2 rounded-lg text-sm font-medium text-[#374151] transition hover:text-brand-700 hover:bg-brand-50"
               >
                 {item.label}
               </Link>

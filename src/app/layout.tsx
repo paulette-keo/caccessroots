@@ -19,11 +19,10 @@ const serif = Fraunces({
 export const metadata: Metadata = {
   title: "CAccessRoots | Communication. Access. Roots.",
   description:
-    "A KEO Solutions-sponsored pro bono platform connecting Deaf community members with volunteer interpreters for the moments that matter.",
+    "A community-led pro bono platform connecting Deaf community members with volunteer interpreters for the moments that matter.",
 
   keywords: [
     "CAccessRoots",
-    "KEO Solutions",
     "Deaf community",
     "ASL interpreters",
     "volunteer interpreters",

@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { Wordmark } from "@/components/wordmark";
 
 export default function LandingPage() {
   return (
@@ -9,14 +9,7 @@ export default function LandingPage() {
       <header className="mx-auto max-w-6xl px-4 py-5 sm:px-6">
         <div className="flex items-center justify-between gap-4">
           <Link href="/" className="flex shrink-0 items-center">
-            <Image
-              src="/applied-development-logo.png"
-              alt="Applied Development"
-              width={220}
-              height={90}
-              className="h-12 w-auto object-contain sm:h-14 md:h-16"
-              priority
-            />
+            <Wordmark size="md" href={null} showSub />
           </Link>
 
           <nav
@@ -25,14 +18,14 @@ export default function LandingPage() {
           >
             <Link
               href="/sign-in"
-              className="rounded-lg border border-[#DB1F26] px-3 py-2.5 text-sm font-medium text-[#DB1F26] transition hover:bg-[#FCEBEC] focus:outline-none focus:ring-2 focus:ring-[#DB1F26] focus:ring-offset-2 sm:px-5 sm:text-base"
+              className="rounded-lg border border-[#2F6B4F] px-3 py-2.5 text-sm font-medium text-[#2F6B4F] transition hover:bg-[#EDF7F1] focus:outline-none focus:ring-2 focus:ring-[#2F6B4F] focus:ring-offset-2 sm:px-5 sm:text-base"
             >
               Sign in
             </Link>
 
             <Link
               href="/request"
-              className="rounded-lg bg-[#DB1F26] px-3 py-2.5 text-sm font-medium text-white transition hover:bg-[#B8171D] focus:outline-none focus:ring-2 focus:ring-[#DB1F26] focus:ring-offset-2 sm:px-5 sm:text-base"
+              className="rounded-lg bg-[#2F6B4F] px-3 py-2.5 text-sm font-medium text-white transition hover:bg-[#24543E] focus:outline-none focus:ring-2 focus:ring-[#2F6B4F] focus:ring-offset-2 sm:px-5 sm:text-base"
             >
               Request help
             </Link>
@@ -44,15 +37,15 @@ export default function LandingPage() {
       <section className="mx-auto max-w-6xl px-6 pb-20 pt-12 md:pb-24 md:pt-16">
         <div className="grid items-center gap-12 md:grid-cols-2">
           <div>
-            <p className="mb-5 inline-flex rounded-full bg-[#FCEBEC] px-4 py-2 text-sm font-medium text-[#DB1F26]">
-              Powered by Applied Development
+            <p className="mb-5 inline-flex rounded-full bg-[#EDF7F1] px-4 py-2 text-sm font-medium text-[#2F6B4F]">
+              Community-led pro bono access
             </p>
 
             <h1 className="font-serif text-5xl font-medium leading-[1.05] tracking-tight text-[#0A0D12] md:text-6xl">
               Where access
               <br />
               takes{" "}
-              <em className="not-italic text-[#DB1F26]">root.</em>
+              <em className="not-italic text-[#2F6B4F]">root.</em>
             </h1>
 
             <div className="mt-6 max-w-lg space-y-4 text-lg leading-relaxed text-[#374151]">
@@ -75,14 +68,14 @@ export default function LandingPage() {
               <div className="flex flex-nowrap gap-3 sm:gap-4">
                 <Link
                   href="/request"
-                  className="inline-flex min-h-12 min-w-0 flex-1 items-center justify-center rounded-lg bg-[#DB1F26] px-3 py-3 text-center text-sm font-medium leading-tight text-white transition hover:bg-[#B8171D] focus:outline-none focus:ring-2 focus:ring-[#DB1F26] focus:ring-offset-2 sm:px-6 sm:text-base"
+                  className="inline-flex min-h-12 min-w-0 flex-1 items-center justify-center rounded-lg bg-[#2F6B4F] px-3 py-3 text-center text-sm font-medium leading-tight text-white transition hover:bg-[#24543E] focus:outline-none focus:ring-2 focus:ring-[#2F6B4F] focus:ring-offset-2 sm:px-6 sm:text-base"
                 >
                   Request an interpreter
                 </Link>
 
                 <Link
                   href="/sign-up?role=interpreter"
-                  className="inline-flex min-h-12 min-w-0 flex-1 items-center justify-center rounded-lg border border-[#DB1F26] px-3 py-3 text-center text-sm font-medium leading-tight text-[#DB1F26] transition hover:bg-[#FCEBEC] focus:outline-none focus:ring-2 focus:ring-[#DB1F26] focus:ring-offset-2 sm:px-6 sm:text-base"
+                  className="inline-flex min-h-12 min-w-0 flex-1 items-center justify-center rounded-lg border border-[#2F6B4F] px-3 py-3 text-center text-sm font-medium leading-tight text-[#2F6B4F] transition hover:bg-[#EDF7F1] focus:outline-none focus:ring-2 focus:ring-[#2F6B4F] focus:ring-offset-2 sm:px-6 sm:text-base"
                 >
                   Volunteer to interpret
                 </Link>
@@ -94,7 +87,7 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <p className="mt-6 text-sm font-medium italic text-[#DB1F26]">
+            <p className="mt-6 text-sm font-medium italic text-[#2F6B4F]">
               Communication. Access. Roots.
             </p>
           </div>
@@ -141,7 +134,7 @@ export default function LandingPage() {
           </h2>
 
           <div
-            className="mx-auto mt-5 h-1 w-12 rounded-full bg-[#DB1F26]"
+            className="mx-auto mt-5 h-1 w-12 rounded-full bg-[#2F6B4F]"
             aria-hidden="true"
           />
 
@@ -168,7 +161,7 @@ export default function LandingPage() {
               to be caught up. One participant, describing a Christmas game with her own family, put it plainly.
             </p>
 
-           <blockquote className="rounded-r-xl border-l-4 border-[#DB1F26] bg-[#FCEBEC] px-6 py-5 text-center italic text-[#374151]">
+           <blockquote className="rounded-r-xl border-l-4 border-[#2F6B4F] bg-[#EDF7F1] px-6 py-5 text-center italic text-[#374151]">
           <p>“I so wanted to be a part of that. I felt so alone.”</p>
 
           <footer className="mt-2 text-sm not-italic text-[#6B7280]">
@@ -242,23 +235,13 @@ export default function LandingPage() {
 
       {/* FOOTER */}
       <footer className="px-6 py-10 text-center text-sm text-[#6B7280]">
-        <Link
-          href="/"
-          className="inline-flex items-center justify-center"
-          aria-label="Applied Development home"
-        >
-          <Image
-            src="/applied-development-logo.png"
-            alt="Applied Development"
-            width={180}
-            height={75}
-            className="h-12 w-auto object-contain md:h-14"
-          />
-        </Link>
+        <div className="inline-flex items-center justify-center">
+          <Wordmark size="md" href={null} />
+        </div>
 
         <p className="mt-4 italic">
-          A pro bono initiative of Applied Development. No fees, no invoices,
-          no contracts—for anyone.
+          A community-led pro bono platform. No fees, no invoices, no
+          contracts—for anyone.
         </p>
 
         <p className="mt-2 text-xs text-[#6B7280]">
@@ -279,7 +262,7 @@ function Feature({
   return (
     <li className="flex gap-4">
       <div
-        className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-[#DB1F26]"
+        className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-[#2F6B4F]"
         aria-hidden="true"
       />
 
@@ -376,7 +359,7 @@ function CoverageGuide() {
       <div className="mx-auto max-w-6xl px-6">
         {/* INTRO */}
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-sm font-semibold uppercase tracking-wider text-[#DB1F26]">
+          <p className="text-sm font-semibold uppercase tracking-wider text-[#2F6B4F]">
             Know your rights
           </p>
 
@@ -406,7 +389,7 @@ function CoverageGuide() {
         </div>
 
         {/* TWO THINGS WORTH KNOWING */}
-        <div className="mx-auto mt-10 max-w-4xl rounded-2xl border border-[#F3C4C6] bg-[#FCEBEC] p-6 md:p-8">
+        <div className="mx-auto mt-10 max-w-4xl rounded-2xl border border-[#B6DDC5] bg-[#EDF7F1] p-6 md:p-8">
           <h3 className="font-serif text-2xl text-[#0A0D12]">
             Two things worth knowing
           </h3>
@@ -539,7 +522,7 @@ function CoverageTable({
 
       <div className="mt-6 overflow-x-auto rounded-2xl border border-[#D1D5DB]">
         <table className="w-full min-w-[700px] border-collapse bg-white text-left">
-          <thead className="bg-[#071B2A] text-white">
+          <thead className="bg-[#173629] text-white">
             <tr>
               <th
                 scope="col"

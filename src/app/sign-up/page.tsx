@@ -122,7 +122,7 @@ function SignUpForm() {
         >
           <Link
             href={role === "requestor" && hasLockedRole ? "/request" : "/"}
-            className="text-sm text-[#DB1F26]"
+            className="text-sm text-[#2F6B4F]"
           >
             ← Back
           </Link>
@@ -148,7 +148,7 @@ function SignUpForm() {
           </p>
 
           {hasLockedRole ? (
-            <div className="mt-6 rounded-xl border border-[#DB1F26] bg-[#FCEBEC] p-4">
+            <div className="mt-6 rounded-xl border border-[#2F6B4F] bg-[#EDF7F1] p-4">
               <p className="font-medium text-[#0A0D12]">
                 {ROLES.find((option) => option.value === role)?.label}
               </p>
@@ -163,8 +163,8 @@ function SignUpForm() {
                   key={r.value}
                   className={`block cursor-pointer rounded-xl border p-4 transition ${
                     role === r.value
-                      ? "border-[#DB1F26] bg-[#FCEBEC]"
-                      : "border-[#E5E7EB] hover:border-[#DB1F26]"
+                      ? "border-[#2F6B4F] bg-[#EDF7F1]"
+                      : "border-[#E5E7EB] hover:border-[#2F6B4F]"
                   }`}
                 >
                   <div className="flex items-start gap-3">
@@ -264,7 +264,7 @@ function SignUpForm() {
             Already have an account?{" "}
             <Link
               href="/sign-in"
-              className="font-medium text-[#DB1F26] underline-offset-2 hover:underline"
+              className="font-medium text-[#2F6B4F] underline-offset-2 hover:underline"
             >
               Sign in
             </Link>
@@ -279,9 +279,9 @@ function VolunteerRecruitingSection() {
   return (
     <section
       aria-labelledby="volunteer-recruiting-heading"
-      className="rounded-2xl bg-[#071B2A] p-7 shadow-sm sm:p-9"
+      className="rounded-2xl bg-[#173629] p-7 shadow-sm sm:p-9"
     >
-      <p className="text-sm font-semibold uppercase tracking-wider text-[#FF9A9E]">
+      <p className="text-sm font-semibold uppercase tracking-wider text-[#A7E0BF]">
         Volunteer to interpret
       </p>
 
@@ -303,7 +303,7 @@ function VolunteerRecruitingSection() {
         behavior 6.7:
       </p>
 
-      <blockquote className="mt-4 rounded-r-xl border-l-4 border-[#DB1F26] bg-white/10 px-5 py-4 text-lg italic leading-relaxed text-[#F9FAFB]">
+      <blockquote className="mt-4 rounded-r-xl border-l-4 border-[#5EAA7D] bg-white/10 px-5 py-4 text-lg italic leading-relaxed text-[#F9FAFB]">
         “Render pro bono services in a fair and reasonable manner.”
       </blockquote>
 
@@ -320,7 +320,7 @@ function VolunteerRecruitingSection() {
           the problem exactly:
         </p>
 
-        <blockquote className="rounded-r-xl border-l-4 border-[#FF9A9E] bg-white/10 px-5 py-4 italic leading-relaxed text-[#F9FAFB]">
+        <blockquote className="rounded-r-xl border-l-4 border-[#A7E0BF] bg-white/10 px-5 py-4 italic leading-relaxed text-[#F9FAFB]">
           <p>
             “There are still life events and activities where the only
             stakeholder is the Deaf or DeafBlind individual. No agency is

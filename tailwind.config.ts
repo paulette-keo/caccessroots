@@ -1,27 +1,27 @@
 import type { Config } from "tailwindcss";
 
 // CAccessRoots brand palette.
-// "brand" is mapped to sage — this is the everyday voice across the app.
-// Deeper accents (forest, river) and terracotta show up for headings,
-// primary CTAs, info moments, and sensitivity flags.
+// "brand" is a calm, accessible green used across navigation, controls,
+// links, and calls to action. Terracotta remains reserved for warnings and
+// destructive actions so status meaning is not lost.
 
 const config: Config = {
   content: ["./src/**/*.{ts,tsx,js,jsx,mdx}"],
   theme: {
     extend: {
       colors: {
-        // Sage — the everyday voice
+        // CAccessRoots green — the everyday voice
         brand: {
-          50: "#F1F4EE",
-          100: "#E4EBD8",
-          200: "#C8D7B2",
-          300: "#AEC392",
-          400: "#91AC74",
-          500: "#74935A",
-          600: "#5D7D45",
-          700: "#476035",
-          800: "#3D5430",
-          900: "#243B20",
+          50: "#EDF7F1",
+          100: "#D9EEE2",
+          200: "#B6DDC5",
+          300: "#8BC6A3",
+          400: "#5EAA7D",
+          500: "#3F8B62",
+          600: "#2F6B4F",
+          700: "#25563F",
+          800: "#1F4534",
+          900: "#173629",
         },
         // Deep forest — primary CTAs, page titles, admin nav
         forest: {

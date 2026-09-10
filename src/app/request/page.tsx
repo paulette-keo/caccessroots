@@ -11,19 +11,19 @@ export default function RequestInterpreterPage() {
   return (
     <main className="min-h-screen bg-[#FAFAFA] px-4 py-12 sm:py-16">
       <div className="mx-auto max-w-3xl">
-        <Link href="/" className="text-sm font-medium text-[#DB1F26]">
+        <Link href="/" className="text-sm font-medium text-[#2F6B4F]">
           ← Back to home
         </Link>
 
         <section className="card mt-5 p-7 sm:p-10">
-          <p className="text-sm font-semibold uppercase tracking-wider text-[#DB1F26]">
+          <p className="text-sm font-semibold uppercase tracking-wider text-[#2F6B4F]">
             Request an interpreter
           </p>
           <h1 className="mt-3 font-serif text-4xl leading-tight text-[#0A0D12] sm:text-5xl">
             For personal moments that have nowhere else to go.
           </h1>
 
-          <div className="mt-7 rounded-xl border-l-4 border-[#DB1F26] bg-[#FCEBEC] p-5">
+          <div className="mt-7 rounded-xl border-l-4 border-[#2F6B4F] bg-[#EDF7F1] p-5">
             <h2 className="font-semibold text-[#0A0D12]">
               Before you continue
             </h2>
@@ -46,7 +46,7 @@ export default function RequestInterpreterPage() {
               <ul className="mt-4 space-y-2 text-[#374151]">
                 {ELIGIBLE_EXAMPLES.map((example) => (
                   <li key={example} className="flex gap-2">
-                    <span aria-hidden="true" className="text-[#DB1F26]">
+                    <span aria-hidden="true" className="text-[#2F6B4F]">
                       ✓
                     </span>
                     <span>{example}</span>

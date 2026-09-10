@@ -38,71 +38,71 @@
   }
 
   .btn:focus {
-    outline: 2px solid #db1f26;
+    outline: 2px solid #2f6b4f;
     outline-offset: 2px;
   }
 
-  /* Primary Applied Development button */
+  /* Primary CAccessRoots button */
   .btn-primary {
     @apply btn text-white;
-    background-color: #db1f26;
+    background-color: #2f6b4f;
   }
 
   .btn-primary:hover {
-    background-color: #b8171d;
+    background-color: #24543e;
   }
 
-  /* Secondary Applied Development button */
+  /* Secondary CAccessRoots button */
   .btn-secondary {
     @apply btn bg-white;
-    color: #db1f26;
-    border: 1px solid #db1f26;
+    color: #2f6b4f;
+    border: 1px solid #2f6b4f;
   }
 
   .btn-secondary:hover {
-    background-color: #fcebec;
+    background-color: #edf7f1;
   }
 
   /* Sign in */
   .btn-sign-in {
     @apply btn bg-white;
-    color: #db1f26;
-    border: 1px solid #db1f26;
+    color: #2f6b4f;
+    border: 1px solid #2f6b4f;
   }
 
   .btn-sign-in:hover {
-    background-color: #fcebec;
+    background-color: #edf7f1;
   }
 
   /* Get started */
   .btn-get-started {
     @apply btn text-white;
-    background-color: #db1f26;
+    background-color: #2f6b4f;
   }
 
   .btn-get-started:hover {
-    background-color: #b8171d;
+    background-color: #24543e;
   }
 
   /* Request an interpreter */
   .btn-request-interpreter {
     @apply btn text-white;
-    background-color: #db1f26;
+    background-color: #2f6b4f;
   }
 
   .btn-request-interpreter:hover {
-    background-color: #b8171d;
+    background-color: #24543e;
   }
 
   /* Volunteer to interpret */
   .btn-volunteer {
     @apply btn bg-white;
-    color: #db1f26;
-    border: 1px solid #db1f26;
+    color: #2f6b4f;
+    border: 1px solid #2f6b4f;
   }
 
   .btn-volunteer:hover {
-    background-color: #fcebec;
+    background-color: #edf7f1;
   }
 
   /* Danger button */
@@ -122,9 +122,9 @@
   }
 
   .input:focus {
-    border-color: #db1f26;
+    border-color: #2f6b4f;
     outline: none;
-    box-shadow: 0 0 0 3px rgba(219, 31, 38, 0.15);
+    box-shadow: 0 0 0 3px rgba(47, 107, 79, 0.18);
   }
 
   .label {
@@ -145,6 +145,6 @@
   }
 
   .brand-wordmark .accent-c {
-    color: #db1f26;
+    color: #2f6b4f;
   }
 }
