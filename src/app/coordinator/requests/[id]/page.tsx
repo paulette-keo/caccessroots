@@ -354,6 +354,12 @@ export default async function MatchRequestPage({
                 existingAssignment?.accepted_at
               );
 
+            const wasDeclinedByRequester =
+              existingAssignment?.status ===
+                "cancelled" &&
+              existingAssignment?.decline_reason ===
+                "Declined by requester";
+
             return (
               <div
                 key={r.interpreter_id}
@@ -478,6 +484,13 @@ export default async function MatchRequestPage({
                           declined this request.
                         </p>
                       )}
+
+                    {wasDeclinedByRequester && (
+                      <p className="text-xs text-ink-muted mt-2">
+                        The requester previously declined
+                        this proposed match.
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -526,10 +539,17 @@ export default async function MatchRequestPage({
                       </span>
                     )}
 
+                  {wasDeclinedByRequester && (
+                    <span className="badge bg-terra-100 text-terra-900">
+                      Declined by requester
+                    </span>
+                  )}
+
                   {canAssignNewInterpreter &&
                     (!existingAssignment ||
                       existingAssignment.status ===
-                        "declined") && (
+                        "declined" ||
+                      wasDeclinedByRequester) && (
                       <form
                         action={
                           proposeAssignmentAction
@@ -550,9 +570,11 @@ export default async function MatchRequestPage({
                         />
 
                         <button className="btn-primary text-sm py-1.5 px-3">
-                          {existingAssignment?.status ===
-                          "declined"
-                            ? "Reassign"
+                          {wasDeclinedByRequester
+                            ? "Re-propose to requester"
+                            : existingAssignment?.status ===
+                                "declined"
+                              ? "Reassign"
                             : request.sensitivity ===
                                 "sensitive"
                               ? "Send for admin review"
