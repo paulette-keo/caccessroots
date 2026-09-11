@@ -435,8 +435,14 @@ create policy "assignments staff all"
 
 create policy "assignments interpreter respond"
   on assignments for update
-  using (interpreter_id = auth.uid() and status = 'released')
-  with check (interpreter_id = auth.uid());
+  using (
+    interpreter_id = auth.uid()
+    and status in ('released', 'accepted')
+  )
+  with check (
+    interpreter_id = auth.uid()
+    and status in ('accepted', 'declined')
+  );
 
 -- ------- approvals (admin only) -------
 create policy "approvals admin all"
