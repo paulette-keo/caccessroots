@@ -4,168 +4,130 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-export async function proposeAssignmentAction(formData: FormData) {
-  const supabase = createSupabaseServerClient();
+const ACTIVE_ASSIGNMENT_STATUSES = [
+  "proposed",
+  "pending_admin_release",
+  "released",
+  "accepted",
+];
 
+export async function inviteTeamMemberAction(formData: FormData) {
+  const supabase = createSupabaseServerClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) throw new Error("Not signed in");
 
-  const request_id = String(formData.get("request_id") ?? "");
-  const interpreter_id = String(formData.get("interpreter_id") ?? "");
+  const requestId = String(formData.get("request_id") ?? "");
+  const interpreterId = String(formData.get("interpreter_id") ?? "");
+  const teamRole = String(formData.get("team_role") ?? "");
 
-  if (!request_id || !interpreter_id) {
+  if (!requestId || !interpreterId) {
     throw new Error("Missing request or interpreter");
   }
+  if (teamRole !== "student" && teamRole !== "mentor") {
+    throw new Error("Select a valid team role");
+  }
 
-  const { data: req, error: requestLookupError } = await supabase
+  const { data: request, error: requestError } = await supabase
     .from("requests")
-    .select("sensitivity,status")
-    .eq("id", request_id)
+    .select("status")
+    .eq("id", requestId)
     .single();
-
-  if (requestLookupError) {
-    throw new Error(requestLookupError.message);
+  if (requestError) throw new Error(requestError.message);
+  if (!["open", "pending_acceptance"].includes(request.status)) {
+    throw new Error("This request is not available for team matching");
   }
 
-  if (req.status !== "open") {
-    throw new Error("This request is not open for matching");
+  const { data: interpreter, error: interpreterError } = await supabase
+    .from("profiles")
+    .select("role,status")
+    .eq("id", interpreterId)
+    .single();
+  if (interpreterError) throw new Error(interpreterError.message);
+  if (interpreter.role !== "interpreter" || interpreter.status !== "active") {
+    throw new Error("This interpreter is not active");
   }
 
-  const initialAssignmentStatus =
-    req.sensitivity === "sensitive"
-      ? "pending_admin_release"
-      : "proposed";
+  const { data: interpreterProfile, error: profileError } = await supabase
+    .from("interpreter_profiles")
+    .select("is_advanced_itp_student,willing_to_mentor")
+    .eq("profile_id", interpreterId)
+    .single();
+  if (profileError) throw new Error(profileError.message);
 
-  /*
-   * Check whether this interpreter already has an assignment
-   * record for this request.
-   *
-   * This can happen when:
-   * - the interpreter previously declined
-   * - the interpreter previously accepted and later withdrew
-   * - the coordinator is trying the same interpreter again
-   */
-  const { data: existingAssignment, error: existingError } = await supabase
+  if (teamRole === "student" && !interpreterProfile.is_advanced_itp_student) {
+    throw new Error("Only an Advanced ITP student can fill the student role");
+  }
+  if (teamRole === "mentor" && !interpreterProfile.willing_to_mentor) {
+    throw new Error("This interpreter has not opted in to mentoring");
+  }
+
+  const { data: occupiedSlot, error: occupiedError } = await supabase
     .from("assignments")
-    .select("id,status")
-    .eq("request_id", request_id)
-    .eq("interpreter_id", interpreter_id)
+    .select("id")
+    .eq("request_id", requestId)
+    .eq("team_role", teamRole)
+    .in("status", ACTIVE_ASSIGNMENT_STATUSES)
+    .limit(1)
+    .maybeSingle();
+  if (occupiedError) throw new Error(occupiedError.message);
+  if (occupiedSlot) {
+    throw new Error(`The ${teamRole} slot is already filled or awaiting a response`);
+  }
+
+  const { data: activeForInterpreter, error: activeInterpreterError } =
+    await supabase
+      .from("assignments")
+      .select("id")
+      .eq("request_id", requestId)
+      .eq("interpreter_id", interpreterId)
+      .in("status", ACTIVE_ASSIGNMENT_STATUSES)
+      .limit(1)
+      .maybeSingle();
+  if (activeInterpreterError) throw new Error(activeInterpreterError.message);
+  if (activeForInterpreter) {
+    throw new Error("The same person cannot fill both team roles");
+  }
+
+  const { data: previousAssignment, error: previousError } = await supabase
+    .from("assignments")
+    .select("id")
+    .eq("request_id", requestId)
+    .eq("interpreter_id", interpreterId)
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
+  if (previousError) throw new Error(previousError.message);
 
-  if (existingError) {
-    throw new Error(existingError.message);
-  }
+  const assignmentValues = {
+    team_role: teamRole,
+    status: "released",
+    proposed_by: user.id,
+    released_by: user.id,
+    released_at: new Date().toISOString(),
+    accepted_at: null,
+    declined_at: null,
+    decline_reason: null,
+    completed_at: null,
+  };
 
-  let assignmentId: string;
-
-  if (existingAssignment) {
-    /*
-     * Do not create a duplicate assignment.
-     * Re-release the existing record instead.
-     */
-    const { data: updatedAssignment, error: updateError } = await supabase
-      .from("assignments")
-      .update({
-        status: initialAssignmentStatus,
-        proposed_by: user.id,
-
-        released_by: null,
-        released_at: null,
-
-        accepted_at: null,
-
-        declined_at: null,
-        decline_reason: null,
-      })
-      .eq("id", existingAssignment.id)
-      .select("id")
-      .single();
-
-    if (updateError) {
-      throw new Error(updateError.message);
-    }
-
-    assignmentId = updatedAssignment.id;
-  } else {
-    /*
-     * No previous assignment exists for this interpreter/request,
-     * so create a new one.
-     */
-    const { data: newAssignment, error: insertError } = await supabase
-      .from("assignments")
-      .insert({
-        request_id,
-        interpreter_id,
-        proposed_by: user.id,
-        status: initialAssignmentStatus,
-      })
-      .select("id")
-      .single();
-
-    if (insertError) {
-      throw new Error(insertError.message);
-    }
-
-    assignmentId = newAssignment.id;
-  }
-
-  if (req?.sensitivity === "sensitive") {
-    /*
-     * Sensitive requests go through approval before release.
-     */
-    const { error: approvalError } = await supabase
-      .from("approvals")
-      .insert({
-        kind: "sensitive_assignment",
-        target_table: "assignments",
-        target_id: assignmentId,
-        requested_by: user.id,
-        requires_two_keys: false,
-        context: {
-          request_id,
-          interpreter_id,
-          assignment_id: assignmentId,
-        },
+  const { error: saveError } = previousAssignment
+    ? await supabase
+        .from("assignments")
+        .update(assignmentValues)
+        .eq("id", previousAssignment.id)
+    : await supabase.from("assignments").insert({
+        request_id: requestId,
+        interpreter_id: interpreterId,
+        ...assignmentValues,
       });
-
-    if (approvalError) {
-      throw new Error(approvalError.message);
-    }
-
-    const { error: requestError } = await supabase
-      .from("requests")
-      .update({ status: "pending_review" })
-      .eq("id", request_id);
-
-    if (requestError) {
-      throw new Error(requestError.message);
-    }
-  } else {
-    /*
-     * Standard request:
-     * hold the proposal for the requester to approve. The interpreter cannot
-     * see either the assignment or request yet.
-     */
-    const { error: requestError } = await supabase
-      .from("requests")
-      .update({ status: "proposed" })
-      .eq("id", request_id);
-
-    if (requestError) {
-      throw new Error(requestError.message);
-    }
-  }
+  if (saveError) throw new Error(saveError.message);
 
   revalidatePath("/coordinator");
-  revalidatePath(`/coordinator/requests/${request_id}`);
+  revalidatePath(`/coordinator/requests/${requestId}`);
   revalidatePath("/interpreter/assignments");
-  revalidatePath("/interpreter/open-requests");
   revalidatePath("/requestor/requests");
-
-  redirect("/coordinator");
+  redirect(`/coordinator/requests/${requestId}`);
 }

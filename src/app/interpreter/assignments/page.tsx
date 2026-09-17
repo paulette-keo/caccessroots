@@ -23,7 +23,7 @@ export default async function MyAssignmentsPage() {
   const { data: rows, error } = await supabase
     .from("assignments")
     .select(
-      "id,status,created_at,accepted_at,declined_at,decline_reason,request_id"
+      "id,team_role,status,created_at,accepted_at,declined_at,decline_reason,request_id"
     )
     .eq("interpreter_id", user.id)
     .order("created_at", { ascending: false });
@@ -66,8 +66,8 @@ export default async function MyAssignmentsPage() {
       <h1 className="text-2xl font-semibold">My assignments</h1>
 
       <p className="text-ink-muted mt-1">
-        You’ll see a request here only after its requester approves the proposed
-        match. You can then accept or decline it.
+        Coordinators invite you as either the Advanced ITP student or mentor.
+        Confirm whether you are available before the team is finalized.
       </p>
 
       <div className="space-y-4 mt-6">
@@ -86,6 +86,12 @@ export default async function MyAssignmentsPage() {
                   <p className="text-xs uppercase tracking-wide text-ink-subtle capitalize">
                     {row.requests?.event_type?.replace("_", " ")}
                   </p>
+
+                  <span className="badge mt-2 bg-slate-100 text-ink-muted">
+                    {row.team_role === "student"
+                      ? "Advanced ITP student"
+                      : "Mentor interpreter"}
+                  </span>
 
                   <h3 className="font-semibold mt-1">
                     {row.requests?.title}
@@ -122,7 +128,7 @@ export default async function MyAssignmentsPage() {
                     />
 
                     <button className="btn-primary text-sm py-1.5 px-3">
-                      Accept
+                      Confirm availability
                     </button>
                   </form>
 
@@ -143,7 +149,7 @@ export default async function MyAssignmentsPage() {
                     />
 
                     <button className="btn-secondary text-sm py-1.5 px-3">
-                      Decline
+                      I’m not available
                     </button>
                   </form>
                 </div>

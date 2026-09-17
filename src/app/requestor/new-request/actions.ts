@@ -49,29 +49,6 @@ export async function createRequestAction(
     formData.get("involves_minor") ===
     "yes";
 
-  const disclaimerAccepted =
-    formData.get("disclaimer_accepted") ===
-    "yes";
-
-  const studentPreference = String(
-    formData.get(
-      "student_interpreter_allowed"
-    ) ?? ""
-  );
-
-  if (
-    !["yes", "no"].includes(
-      studentPreference
-    )
-  ) {
-    throw new Error(
-      "Please indicate whether you are willing to work with an Advanced ITP student."
-    );
-  }
-
-  const student_interpreter_allowed =
-    studentPreference === "yes";
-
   let sensitivity =
     formData.get("sensitivity") ===
     "sensitive"
@@ -114,10 +91,15 @@ export async function createRequestAction(
     );
   }
 
-  if (!disclaimerAccepted) {
-    throw new Error(
-      "You must accept the platform disclaimer to continue"
-    );
+  const { data: requestorProfile, error: commitmentError } = await supabase
+    .from("requestor_profiles")
+    .select("community_commitment_signed_at")
+    .eq("profile_id", user.id)
+    .maybeSingle();
+
+  if (commitmentError) throw new Error(commitmentError.message);
+  if (!requestorProfile?.community_commitment_signed_at) {
+    throw new Error("Complete your requester profile agreement before submitting a request");
   }
 
   if (
@@ -196,6 +178,10 @@ export async function createRequestAction(
     );
   }
 
+  if (sensitivity === "sensitive") {
+    reviewReasons.push("Requester marked the request as sensitive");
+  }
+
   const needsReview =
     reviewReasons.length > 0;
 
@@ -261,7 +247,7 @@ export async function createRequestAction(
       event_end,
       languages_needed,
       modality,
-      student_interpreter_allowed,
+      student_interpreter_allowed: true,
       status: needsReview
         ? "pending_review"
         : "open",

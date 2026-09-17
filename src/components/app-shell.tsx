@@ -6,6 +6,7 @@ import { Wordmark } from "./wordmark";
 const NAV: Record<UserRole, { href: string; label: string }[]> = {
   requestor: [
     { href: "/requestor", label: "Home" },
+    { href: "/requestor/profile", label: "My profile" },
     { href: "/requestor/new-request", label: "New request" },
     { href: "/requestor/requests", label: "My requests" },
     { href: "/requestor/blocklist", label: "My blocklist" },

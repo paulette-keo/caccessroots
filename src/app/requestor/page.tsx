@@ -8,6 +8,12 @@ export default async function RequestorHome() {
   const profile = await requireProfile();
   const supabase = createSupabaseServerClient();
 
+  const { data: requestorProfile } = await supabase
+    .from("requestor_profiles")
+    .select("community_commitment_signed_at")
+    .eq("profile_id", profile.id)
+    .maybeSingle();
+
   const { data: open } = await supabase
     .from("requests")
     .select("id,title,event_start,event_address,status,sensitivity")
@@ -35,6 +41,18 @@ export default async function RequestorHome() {
           </Link>
         </div>
       </section>
+
+      {!requestorProfile?.community_commitment_signed_at && (
+        <section className="card border-l-4 border-amber-400 p-6">
+          <h2 className="font-semibold">Complete your requester profile</h2>
+          <p className="mt-1 text-sm text-ink-muted">
+            Review the community commitments before submitting a request.
+          </p>
+          <Link href="/requestor/profile" className="btn-primary mt-4 inline-block">
+            Complete profile
+          </Link>
+        </section>
+      )}
 
       <section className="card p-6">
         <div className="flex items-center justify-between mb-4">

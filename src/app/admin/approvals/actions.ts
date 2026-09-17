@@ -101,22 +101,22 @@ async function applyApprovalSideEffect(
       }
       break;
     case "sensitive_assignment":
-      // Admin clears the sensitive match for the requester to review. The
-      // interpreter still cannot see it until the requester accepts.
+      // Legacy sensitive-assignment approvals release the invitation directly
+      // to the interpreter. New requests are reviewed before team matching.
       if (approval.context?.request_id && approval.context?.interpreter_id) {
         await supabase
           .from("assignments")
           .update({
-            status: "proposed",
+            status: "released",
             released_by: approverId,
-            released_at: null,
+            released_at: new Date().toISOString(),
           })
           .eq("request_id", approval.context.request_id)
           .eq("interpreter_id", approval.context.interpreter_id)
           .eq("status", "pending_admin_release");
         await supabase
           .from("requests")
-          .update({ status: "proposed" })
+          .update({ status: "pending_acceptance" })
           .eq("id", approval.context.request_id);
       }
       break;

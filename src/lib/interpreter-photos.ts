@@ -3,9 +3,6 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 export const INTERPRETER_PHOTO_BUCKET =
   "interpreter-profile-photos";
 
-export const INTERPRETER_VIDEO_BUCKET =
-  "interpreter-intro-videos";
-
 async function createInterpreterMediaUrl(
   supabase: SupabaseClient,
   bucket: string,
@@ -35,17 +32,6 @@ export async function createInterpreterPhotoUrl(
   return createInterpreterMediaUrl(
     supabase,
     INTERPRETER_PHOTO_BUCKET,
-    path
-  );
-}
-
-export async function createInterpreterVideoUrl(
-  supabase: SupabaseClient,
-  path: string | null | undefined
-) {
-  return createInterpreterMediaUrl(
-    supabase,
-    INTERPRETER_VIDEO_BUCKET,
     path
   );
 }

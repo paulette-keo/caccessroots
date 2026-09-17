@@ -1,12 +1,10 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
-import {
-  createInterpreterPhotoUrl,
-  createInterpreterVideoUrl,
-} from "@/lib/interpreter-photos";
+import { createInterpreterPhotoUrl } from "@/lib/interpreter-photos";
 import { saveInterpreterProfileAction } from "./actions";
 import { ProfileMediaUploader } from "./profile-media-uploader";
 import { StudentStatusFields } from "./student-status-fields";
+import { CertificationFields } from "./certification-fields";
 
 const AVAILABLE_DAYS = [
   ["monday", "Monday"],
@@ -42,12 +40,6 @@ export default async function InterpreterProfilePage({
     await createInterpreterPhotoUrl(
       supabase,
       row?.profile_photo_path
-    );
-
-  const introVideoUrl =
-    await createInterpreterVideoUrl(
-      supabase,
-      row?.intro_video_path
     );
 
   return (
@@ -300,58 +292,18 @@ export default async function InterpreterProfilePage({
           </div>
         </fieldset>
 
-        <div>
-          <label
-            className="label"
-            htmlFor="credentials"
-          >
-            Credentials
-          </label>
-
-          <input
-            id="credentials"
-            name="credentials"
-            className="input"
-            defaultValue={row?.credentials ?? ""}
-            placeholder="RID NIC, BEI, EIPA, etc."
-          />
-        </div>
-
         <fieldset className="rounded-xl border border-slate-200 p-4 space-y-4">
           <legend className="px-2 text-sm font-medium">
             Qualifications and experience
           </legend>
 
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div>
-              <label
-                className="label"
-                htmlFor="is_certified"
-              >
-                Are you currently certified?
-              </label>
+          <CertificationFields
+            defaultIsCertified={row?.is_certified ?? null}
+            defaultCredentials={row?.credentials ?? ""}
+            defaultCertifications={(row?.certifications ?? []).join(", ")}
+          />
 
-              <select
-                id="is_certified"
-                name="is_certified"
-                className="input"
-                defaultValue={
-                  row?.is_certified === true
-                    ? "yes"
-                    : row?.is_certified === false
-                      ? "no"
-                      : ""
-                }
-              >
-                <option value="">
-                  Select an answer
-                </option>
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-              </select>
-            </div>
-
-            <div>
+          <div>
               <label
                 className="label"
                 htmlFor="experience_band"
@@ -383,30 +335,6 @@ export default async function InterpreterProfilePage({
                   11+ years
                 </option>
               </select>
-            </div>
-          </div>
-
-          <div>
-            <label
-              className="label"
-              htmlFor="certifications"
-            >
-              Certifications
-            </label>
-
-            <input
-              id="certifications"
-              name="certifications"
-              className="input"
-              defaultValue={(
-                row?.certifications ?? []
-              ).join(", ")}
-              placeholder="RID NIC, CDI, BEI, EIPA"
-            />
-
-            <p className="text-xs text-ink-muted mt-1">
-              Separate multiple certifications with commas.
-            </p>
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
@@ -457,11 +385,24 @@ export default async function InterpreterProfilePage({
             row?.profile_photo_path ?? null
           }
           currentPhotoUrl={profilePhotoUrl}
-          currentVideoPath={
-            row?.intro_video_path ?? null
-          }
-          currentVideoUrl={introVideoUrl}
         />
+
+        <div>
+          <label className="label" htmlFor="professional_profile_url">
+            Professional, LinkedIn, or practicum profile link (optional)
+          </label>
+          <input
+            id="professional_profile_url"
+            name="professional_profile_url"
+            type="url"
+            className="input"
+            defaultValue={row?.professional_profile_url ?? ""}
+            placeholder="https://…"
+          />
+          <p className="mt-1 text-xs text-ink-muted">
+            Requesters and coordinators can open this link when reviewing a team match.
+          </p>
+        </div>
 
         <StudentStatusFields
           defaultIsAdvancedItpStudent={
@@ -532,20 +473,19 @@ export default async function InterpreterProfilePage({
           <input
             type="checkbox"
             name="accept_pro_bono"
+            required
             defaultChecked={
               !!row?.pro_bono_signed_at
             }
             className="mt-1"
           />
 
-          <span>
-            I accept the pro bono terms — I will not
-            invoice for assignments taken through this
-            platform, I will respect the privacy of
-            every requestor, and I will recuse myself
-            from any assignment where I become aware of
-            a conflict.
-          </span>
+            <span>
+              I commit to this pro bono learning community. I will provide
+              accurate profile details, protect requester privacy, confirm my
+              availability before accepting an assignment, support respectful
+              student-and-mentor teamwork, and recuse myself from conflicts.
+            </span>
         </label>
 
         <button className="btn-primary w-full">

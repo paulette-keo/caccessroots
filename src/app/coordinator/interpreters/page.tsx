@@ -1,8 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import {
-  createInterpreterPhotoUrl,
-  createInterpreterVideoUrl,
-} from "@/lib/interpreter-photos";
+import { createInterpreterPhotoUrl } from "@/lib/interpreter-photos";
 
 export default async function InterpretersDirectoryPage() {
   const supabase =
@@ -12,7 +9,7 @@ export default async function InterpretersDirectoryPage() {
     await supabase
       .from("profiles")
       .select(
-        "id,full_name,email,status,interp:interpreter_profiles(home_address,service_radius_miles,languages,credentials,is_certified,certifications,licenses,specialties,experience_band,profile_photo_path,intro_video_path,willing_to_mentor,willing_to_work_with_students,accepting_requests,available_days,preferred_time_blocks,unavailable_until,total_completed,pro_bono_signed_at)"
+        "id,full_name,email,status,interp:interpreter_profiles(home_address,service_radius_miles,languages,credentials,is_certified,certifications,licenses,specialties,experience_band,profile_photo_path,professional_profile_url,willing_to_mentor,willing_to_work_with_students,is_advanced_itp_student,college_name,accepting_requests,available_days,preferred_time_blocks,unavailable_until,total_completed,pro_bono_signed_at)"
       )
       .eq("role", "interpreter")
       .order("full_name");
@@ -27,13 +24,6 @@ export default async function InterpretersDirectoryPage() {
             supabase,
             interpreter.interp
               ?.profile_photo_path
-          ),
-
-        introVideoUrl:
-          await createInterpreterVideoUrl(
-            supabase,
-            interpreter.interp
-              ?.intro_video_path
           ),
       })
     )
@@ -173,14 +163,14 @@ export default async function InterpretersDirectoryPage() {
   </div>
 )}
                   
-                  {p.introVideoUrl && (
+                  {p.interp?.professional_profile_url && (
                     <a
-                      href={p.introVideoUrl}
+                      href={p.interp.professional_profile_url}
                       target="_blank"
                       rel="noreferrer"
                       className="mt-1 inline-block text-xs text-brand-700 underline"
                     >
-                      View ASL introduction
+                      View professional profile
                     </a>
                   )}
                 </td>

@@ -48,6 +48,7 @@ function SignUpForm() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [commitmentAccepted, setCommitmentAccepted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -65,6 +66,7 @@ function SignUpForm() {
         data: {
           full_name: fullName.trim(),
           role,
+          community_commitment_accepted: commitmentAccepted,
         },
       },
     });
@@ -245,6 +247,21 @@ function SignUpForm() {
               </p>
             </div>
 
+            <label className="flex items-start gap-3 rounded-xl border border-[#B7D8C4] bg-[#EDF7F1] p-4 text-sm leading-relaxed text-[#374151]">
+              <input
+                type="checkbox"
+                required
+                checked={commitmentAccepted}
+                onChange={(event) => setCommitmentAccepted(event.target.checked)}
+                className="mt-1"
+              />
+              <span>
+                {isInterpreter
+                  ? "I agree to participate in this pro bono learning community, protect requester privacy, provide accurate profile information, and confirm my availability before accepting a student or mentor assignment."
+                  : "I understand that each request is supported by an Advanced ITP student and mentor, profile details are self-disclosed, and volunteer coverage cannot be guaranteed. I agree to protect the privacy of the people who serve my request."}
+              </span>
+            </label>
+
             {error && (
               <p className="rounded-lg bg-[#FEF3F2] px-3 py-2 text-sm text-[#B42318]">
                 {error}
@@ -293,57 +310,27 @@ function VolunteerRecruitingSection() {
       </h1>
     
       <p className="mt-4 text-lg leading-relaxed text-[#E5E7EB]">
-        We all feel this sense of duty, as our Code asks us to do this.
-        Finally, there is now a centralized platform where you can offer
-        your services and be matched with local opportunities.
+        We’re building a community of learning and practice where Advanced
+        ITP students team with experienced mentors to serve local pro bono
+        requests. Every match helps meet a need today while strengthening the
+        interpreting community for the future.
       </p>
 
       <p className="mt-6 leading-relaxed text-[#E5E7EB]">
-        The NAD-RID Code of Professional Conduct, Tenet 6.0, illustrative
-        behavior 6.7:
+        Students gain supported, real-world experience. Mentors share judgment
+        and practice. Deaf requesters receive a coordinated team for moments
+        that may otherwise go uncovered.
       </p>
 
-      <blockquote className="mt-4 rounded-r-xl border-l-4 border-[#5EAA7D] bg-white/10 px-5 py-4 text-lg italic leading-relaxed text-[#F9FAFB]">
-        “Render pro bono services in a fair and reasonable manner.”
-      </blockquote>
-
-      <div className="mt-6 space-y-5 leading-relaxed text-[#E5E7EB]">
-        <p>
-          For most interpreters, pro bono work arrives by accident. A
-          friend of a friend. A request after church. A text on a Tuesday
-          night from someone who happens to have your number. You say yes
-          when you can and carry the ones you couldn’t.
-        </p>
-
-        <p>
-          Ten years ago, an interpreter writing on StreetLeverage named
-          the problem exactly:
-        </p>
-
-        <blockquote className="rounded-r-xl border-l-4 border-[#A7E0BF] bg-white/10 px-5 py-4 italic leading-relaxed text-[#F9FAFB]">
-          <p>
-            “There are still life events and activities where the only
-            stakeholder is the Deaf or DeafBlind individual. No agency is
-            offering a service that would mandate hiring a sign language
-            interpreter.”
-          </p>
-
-          <footer className="mt-3 text-sm not-italic text-[#CBD5E1]">
-            Mala,{" "}
-            <cite>
-              Giving Back: Have Sign Language Interpreters Forgotten Their
-              Roots?
-            </cite>
-            , StreetLeverage, 2015
-          </footer>
-        </blockquote>
-
-        <p>
-          That’s what this is. Requests you can see, filtered to a distance
-          you can drive, in a volume you can choose. Fair and reasonable
-          becomes something you can point to.
-        </p>
+      <div className="mt-4 rounded-r-xl border-l-4 border-[#5EAA7D] bg-white/10 px-5 py-4 text-lg leading-relaxed text-[#F9FAFB]">
+        Learn together. Serve together. Grow the next generation of community interpreters.
       </div>
+
+      <p className="mt-6 leading-relaxed text-[#E5E7EB]">
+        Choose the distance and availability that work for you. Coordinators
+        assemble each student-and-mentor team, and every volunteer confirms
+        availability before the assignment is final.
+      </p>
     </section>
   );
 }

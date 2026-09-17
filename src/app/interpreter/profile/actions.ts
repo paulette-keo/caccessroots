@@ -4,10 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { geocodeAddress } from "@/lib/geocode";
-import {
-  INTERPRETER_PHOTO_BUCKET,
-  INTERPRETER_VIDEO_BUCKET,
-} from "@/lib/interpreter-photos";
+import { INTERPRETER_PHOTO_BUCKET } from "@/lib/interpreter-photos";
 
 const EXPERIENCE_BANDS = new Set([
   "less_than_2",
@@ -114,7 +111,7 @@ export async function saveInterpreterProfileAction(
     formData.getAll("modalities") as string[]
   ).filter(Boolean);
 
-  const credentials =
+  const submittedCredentials =
     String(
       formData.get("credentials") ?? ""
     ).trim() || null;
@@ -130,9 +127,12 @@ export async function saveInterpreterProfileAction(
         ? false
         : null;
 
-  const certifications = parseList(
+  const submittedCertifications = parseList(
     formData.get("certifications")
   );
+
+  const credentials = is_certified === true ? submittedCredentials : null;
+  const certifications = is_certified === true ? submittedCertifications : [];
 
   const licenses = parseList(
     formData.get("licenses")
@@ -169,20 +169,20 @@ export async function saveInterpreterProfileAction(
   const is_advanced_itp_student =
     formData.get("is_advanced_itp_student") === "yes";
 
-const college_name = is_advanced_itp_student
-  ? String(
-      formData.get("college_name") ?? ""
-    ).trim() || null
-  : null;
+  const college_name = is_advanced_itp_student
+    ? String(
+        formData.get("college_name") ?? ""
+      ).trim() || null
+    : null;
 
-if (
-  is_advanced_itp_student &&
-  !college_name
-) {
-  throw new Error(
-    "Enter the college or ITP program you attend."
-  );
-}
+  if (
+    is_advanced_itp_student &&
+    !college_name
+  ) {
+    throw new Error(
+      "Enter the college or ITP program you attend."
+    );
+  }
 
   /*
    * This marker prevents the availability values from
@@ -256,6 +256,26 @@ if (
   const accept =
     formData.get("accept_pro_bono") === "on";
 
+  if (!accept) {
+    throw new Error("Accept the interpreter community commitments to save your profile.");
+  }
+
+  const professional_profile_url = String(
+    formData.get("professional_profile_url") ?? ""
+  ).trim() || null;
+
+  if (professional_profile_url) {
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(professional_profile_url);
+    } catch {
+      throw new Error("Enter a valid professional profile link.");
+    }
+    if (!["http:", "https:"].includes(parsedUrl.protocol)) {
+      throw new Error("The professional profile link must start with http:// or https://.");
+    }
+  }
+
   let geo = null;
 
   if (home_address) {
@@ -273,9 +293,7 @@ if (
     error: existingProfileError,
   } = await supabase
     .from("interpreter_profiles")
-    .select(
-      "profile_photo_path,intro_video_path"
-    )
+    .select("profile_photo_path")
     .eq("profile_id", user.id)
     .maybeSingle();
 
@@ -289,10 +307,6 @@ if (
     formData.get("remove_profile_photo") ===
     "on";
 
-  const removeVideo =
-    formData.get("remove_intro_video") ===
-    "on";
-
   const submittedPhotoPath =
     parseOwnedMediaPath(
       formData.get("profile_photo_path"),
@@ -300,23 +314,10 @@ if (
       "Profile photo"
     );
 
-  const submittedVideoPath =
-    parseOwnedMediaPath(
-      formData.get("intro_video_path"),
-      user.id,
-      "Introduction video"
-    );
-
   const nextPhotoPath = removePhoto
     ? null
     : submittedPhotoPath ??
       existingProfile?.profile_photo_path ??
-      null;
-
-  const nextVideoPath = removeVideo
-    ? null
-    : submittedVideoPath ??
-      existingProfile?.intro_video_path ??
       null;
 
   const update: Record<string, unknown> = {
@@ -337,8 +338,7 @@ if (
     specialties,
     experience_band,
     profile_photo_path: nextPhotoPath,
-    intro_video_path: nextVideoPath,
-    intro_video_url: null,
+    professional_profile_url,
     willing_to_mentor,
     willing_to_work_with_students,
     is_advanced_itp_student,
@@ -353,10 +353,7 @@ if (
       `${geo.longitude} ${geo.latitude})`;
   }
 
-  if (accept && pro_bono_commitment) {
-    update.pro_bono_signed_at =
-      new Date().toISOString();
-  }
+  update.pro_bono_signed_at = new Date().toISOString();
 
   const { error } = await supabase
     .from("interpreter_profiles")
@@ -373,16 +370,6 @@ if (
       await supabase.storage
         .from(INTERPRETER_PHOTO_BUCKET)
         .remove([nextPhotoPath]);
-    }
-
-    if (
-      nextVideoPath &&
-      nextVideoPath !==
-        existingProfile?.intro_video_path
-    ) {
-      await supabase.storage
-        .from(INTERPRETER_VIDEO_BUCKET)
-        .remove([nextVideoPath]);
     }
 
     throw new Error(error.message);
@@ -408,30 +395,10 @@ if (
     }
   }
 
-  const previousVideoPath =
-    existingProfile?.intro_video_path;
-
-  if (
-    previousVideoPath &&
-    previousVideoPath !== nextVideoPath
-  ) {
-    const { error: removalError } =
-      await supabase.storage
-        .from(INTERPRETER_VIDEO_BUCKET)
-        .remove([previousVideoPath]);
-
-    if (removalError) {
-      console.error(
-        "Could not remove previous introduction video:",
-        removalError
-      );
-    }
-  }
-
   revalidatePath("/interpreter/profile");
-revalidatePath("/interpreter");
-revalidatePath("/coordinator");
-revalidatePath("/coordinator/interpreters");
+  revalidatePath("/interpreter");
+  revalidatePath("/coordinator");
+  revalidatePath("/coordinator/interpreters");
 
-redirect("/interpreter/profile?saved=1");
+  redirect("/interpreter/profile?saved=1");
 }
