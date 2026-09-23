@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { geocodeAddress } from "@/lib/geocode";
 import { INTERPRETER_PHOTO_BUCKET } from "@/lib/interpreter-photos";
+import { isInterpreterRole } from "@/lib/types";
 
 const EXPERIENCE_BANDS = new Set([
   "less_than_2",
@@ -95,6 +96,31 @@ export async function saveInterpreterProfileAction(
     throw new Error("Not signed in");
   }
 
+  const { data: account, error: accountError } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (accountError) {
+    throw new Error(accountError.message);
+  }
+
+  if (!isInterpreterRole(account.role)) {
+    throw new Error("This account does not have an interpreter role.");
+  }
+
+  const { data: existingRoleProfile, error: existingRoleError } =
+    await supabase
+      .from("interpreter_profiles")
+      .select("is_advanced_itp_student")
+      .eq("profile_id", user.id)
+      .maybeSingle();
+
+  if (existingRoleError) {
+    throw new Error(existingRoleError.message);
+  }
+
   const home_address = String(
     formData.get("home_address") ?? ""
   ).trim();
@@ -158,26 +184,16 @@ export async function saveInterpreterProfileAction(
     );
   }
 
-  const interpreterPath = String(
-    formData.get("interpreter_path") ?? ""
-  );
-
-  if (interpreterPath !== "student" && interpreterPath !== "mentor") {
-    throw new Error("Choose Advanced ITP Student or Mentor Interpreter.");
-  }
-
-  const is_advanced_itp_student = interpreterPath === "student";
-  const willing_to_mentor = interpreterPath === "mentor";
-  const willing_to_work_with_students = interpreterPath === "mentor";
-
-  if (
-    interpreterPath === "mentor" &&
-    formData.get("mentor_commitment") !== "on"
-  ) {
-    throw new Error(
-      "Confirm that you agree to support Advanced ITP students as a Mentor Interpreter."
-    );
-  }
+  const is_advanced_itp_student =
+    account.role === "student_interpreter" ||
+    (account.role === "interpreter" &&
+      existingRoleProfile?.is_advanced_itp_student === true);
+  const willing_to_mentor =
+    account.role === "mentor_interpreter" ||
+    (account.role === "interpreter" &&
+      !is_advanced_itp_student);
+  const willing_to_work_with_students =
+    willing_to_mentor;
 
   const college_name = is_advanced_itp_student
     ? String(

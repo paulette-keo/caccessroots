@@ -1,11 +1,48 @@
 // Shared types matching the Supabase schema in supabase/migrations/0001_initial_schema.sql
 // Keep in sync with the SQL enums.
 
+export const INTERPRETER_ROLES = [
+  "student_interpreter",
+  "mentor_interpreter",
+] as const;
+
+export type InterpreterUserRole =
+  (typeof INTERPRETER_ROLES)[number];
+
 export type UserRole =
   | "requestor"
+  | InterpreterUserRole
   | "interpreter"
   | "coordinator"
   | "admin";
+
+export function isInterpreterRole(
+  role: string
+): role is InterpreterUserRole | "interpreter" {
+  return (
+    role === "interpreter" ||
+    INTERPRETER_ROLES.includes(
+      role as InterpreterUserRole
+    )
+  );
+}
+
+export function userRoleLabel(role: UserRole): string {
+  switch (role) {
+    case "student_interpreter":
+      return "Student Interpreter";
+    case "mentor_interpreter":
+      return "Mentor Interpreter";
+    case "interpreter":
+      return "Interpreter";
+    case "requestor":
+      return "Requestor";
+    case "coordinator":
+      return "Coordinator";
+    case "admin":
+      return "Admin";
+  }
+}
 
 export type UserStatus = "pending" | "active" | "suspended" | "archived";
 

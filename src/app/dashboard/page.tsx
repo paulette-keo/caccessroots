@@ -19,6 +19,8 @@ export default async function DashboardRouter() {
     case "coordinator":
       redirect("/coordinator");
 
+    case "student_interpreter":
+    case "mentor_interpreter":
     case "interpreter":
       redirect("/interpreter");
 

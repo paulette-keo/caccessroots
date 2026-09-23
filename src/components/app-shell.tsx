@@ -1,7 +1,17 @@
 import Link from "next/link";
-import type { Profile, UserRole } from "@/lib/types";
+import {
+  userRoleLabel,
+  type Profile,
+  type UserRole,
+} from "@/lib/types";
 import SignOutButton from "./sign-out-button";
 import { Wordmark } from "./wordmark";
+
+const INTERPRETER_NAV = [
+  { href: "/interpreter", label: "Home" },
+  { href: "/interpreter/profile", label: "My profile" },
+  { href: "/interpreter/assignments", label: "My assignments" },
+];
 
 const NAV: Record<UserRole, { href: string; label: string }[]> = {
   requestor: [
@@ -12,11 +22,9 @@ const NAV: Record<UserRole, { href: string; label: string }[]> = {
     { href: "/requestor/blocklist", label: "My blocklist" },
   ],
 
-  interpreter: [
-    { href: "/interpreter", label: "Home" },
-    { href: "/interpreter/profile", label: "My profile" },
-    { href: "/interpreter/assignments", label: "My assignments" },
-  ],
+  student_interpreter: INTERPRETER_NAV,
+  mentor_interpreter: INTERPRETER_NAV,
+  interpreter: INTERPRETER_NAV,
 
   coordinator: [
     { href: "/coordinator", label: "Queue" },
@@ -35,6 +43,8 @@ const NAV: Record<UserRole, { href: string; label: string }[]> = {
 
 const HEADER_TONE: Record<UserRole, string> = {
   requestor: "bg-white border-b border-[#E5E7EB]",
+  student_interpreter: "bg-white border-b border-[#E5E7EB]",
+  mentor_interpreter: "bg-white border-b border-[#E5E7EB]",
   interpreter: "bg-white border-b border-[#E5E7EB]",
   coordinator: "bg-white border-b border-[#E5E7EB]",
   admin: "bg-white border-b border-[#E5E7EB]",
@@ -60,8 +70,8 @@ export default function AppShell({
           >
             <Wordmark size="md" href={null} />
 
-            <span className="badge ml-1 capitalize bg-brand-50 text-brand-700">
-              {profile.role.replace("_", " ")}
+            <span className="badge ml-1 bg-brand-50 text-brand-700">
+              {userRoleLabel(profile.role)}
             </span>
           </Link>
 

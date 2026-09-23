@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createInterpreterPhotoUrl } from "@/lib/interpreter-photos";
+import { userRoleLabel } from "@/lib/types";
 import {
   setUserStatusAction,
   requestRoleEscalationAction,
@@ -137,7 +138,7 @@ export default async function AdminUsersPage({
                 </td>
 
                 <td className="px-4 py-3 capitalize">
-                  {u.role.replace("_", " ")}
+                  {userRoleLabel(u.role)}
                 </td>
 
                 <td className="px-4 py-3">

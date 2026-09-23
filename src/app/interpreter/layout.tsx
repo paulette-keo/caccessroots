@@ -6,6 +6,10 @@ export default async function InterpreterLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const profile = await requireRole(["interpreter", "admin"]);
+  const profile = await requireRole([
+    "student_interpreter",
+    "mentor_interpreter",
+    "interpreter",
+  ]);
   return <AppShell profile={profile}>{children}</AppShell>;
 }

@@ -5,12 +5,15 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { Wordmark } from "@/components/wordmark";
-import type { UserRole } from "@/lib/types";
+import type {
+  InterpreterUserRole,
+  UserRole,
+} from "@/lib/types";
 
-type InterpreterPath = "student" | "mentor";
+type AccountType = "requestor" | "interpreter";
 
-const ROLES: {
-  value: UserRole;
+const ACCOUNT_TYPES: {
+  value: AccountType;
   label: string;
   desc: string;
 }[] = [
@@ -39,19 +42,30 @@ function SignUpForm() {
   const roleParam = params.get("role");
   const nextParam = params.get("next");
 
-  const initialRole: UserRole =
-    roleParam === "interpreter" || roleParam === "requestor"
-      ? roleParam
+  const initialAccountType: AccountType =
+    roleParam === "interpreter" ||
+    roleParam === "student_interpreter" ||
+    roleParam === "mentor_interpreter"
+      ? "interpreter"
       : "requestor";
-  const hasLockedRole =
-    roleParam === "interpreter" || roleParam === "requestor";
+  const hasLockedAccountType =
+    roleParam === "interpreter" ||
+    roleParam === "student_interpreter" ||
+    roleParam === "mentor_interpreter" ||
+    roleParam === "requestor";
 
-  const [role, setRole] = useState<UserRole>(initialRole);
+  const [accountType, setAccountType] =
+    useState<AccountType>(initialAccountType);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [interpreterPath, setInterpreterPath] =
-    useState<InterpreterPath | null>(null);
+  const [interpreterRole, setInterpreterRole] =
+    useState<InterpreterUserRole | null>(
+      roleParam === "student_interpreter" ||
+        roleParam === "mentor_interpreter"
+        ? roleParam
+        : null
+    );
   const [commitmentAccepted, setCommitmentAccepted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -60,10 +74,15 @@ function SignUpForm() {
     e.preventDefault();
     setError(null);
 
-    if (role === "interpreter" && !interpreterPath) {
+    if (accountType === "interpreter" && !interpreterRole) {
       setError("Choose Advanced ITP Student or Mentor Interpreter.");
       return;
     }
+
+    const selectedRole: UserRole =
+      accountType === "requestor"
+        ? "requestor"
+        : interpreterRole!;
 
     setLoading(true);
 
@@ -75,9 +94,7 @@ function SignUpForm() {
       options: {
         data: {
           full_name: fullName.trim(),
-          role,
-          interpreter_path:
-            role === "interpreter" ? interpreterPath : null,
+          role: selectedRole,
           community_commitment_accepted: commitmentAccepted,
         },
       },
@@ -105,7 +122,7 @@ function SignUpForm() {
 
     setLoading(false);
 
-    if (role === "requestor") {
+    if (accountType === "requestor") {
       window.location.href =
         nextParam?.startsWith("/") && !nextParam.startsWith("//")
           ? nextParam
@@ -116,7 +133,7 @@ function SignUpForm() {
     window.location.href = "/pending-approval";
   }
 
-  const isInterpreter = role === "interpreter";
+  const isInterpreter = accountType === "interpreter";
 
   return (
     <main className="min-h-screen bg-[#FAFAFA] px-4 py-12">
@@ -135,7 +152,11 @@ function SignUpForm() {
           }`}
         >
           <Link
-            href={role === "requestor" && hasLockedRole ? "/request" : "/"}
+            href={
+              accountType === "requestor" && hasLockedAccountType
+                ? "/request"
+                : "/"
+            }
             className="text-sm text-[#2F6B4F]"
           >
             ← Back
@@ -156,27 +177,31 @@ function SignUpForm() {
           )}
 
           <p className="mt-1 text-sm text-[#6B7280]">
-            {hasLockedRole
+            {hasLockedAccountType
               ? "Create your account to continue."
               : "Tell us which account you’d like."}
           </p>
 
-          {hasLockedRole ? (
+          {hasLockedAccountType ? (
             <div className="mt-6 rounded-xl border border-[#2F6B4F] bg-[#EDF7F1] p-4">
               <p className="font-medium text-[#0A0D12]">
-                {ROLES.find((option) => option.value === role)?.label}
+                {ACCOUNT_TYPES.find(
+                  (option) => option.value === accountType
+                )?.label}
               </p>
               <p className="mt-1 text-sm text-[#6B7280]">
-                {ROLES.find((option) => option.value === role)?.desc}
+                {ACCOUNT_TYPES.find(
+                  (option) => option.value === accountType
+                )?.desc}
               </p>
             </div>
           ) : (
             <div className="mt-6 space-y-3">
-              {ROLES.map((r) => (
+              {ACCOUNT_TYPES.map((r) => (
                 <label
                   key={r.value}
                   className={`block cursor-pointer rounded-xl border p-4 transition ${
-                    role === r.value
+                    accountType === r.value
                       ? "border-[#2F6B4F] bg-[#EDF7F1]"
                       : "border-[#E5E7EB] hover:border-[#2F6B4F]"
                   }`}
@@ -185,10 +210,15 @@ function SignUpForm() {
                     <input
                       type="radio"
                       className="mt-1"
-                      name="role"
+                      name="accountType"
                       value={r.value}
-                      checked={role === r.value}
-                      onChange={() => setRole(r.value)}
+                      checked={accountType === r.value}
+                      onChange={() => {
+                        setAccountType(r.value);
+                        if (r.value === "requestor") {
+                          setInterpreterRole(null);
+                        }
+                      }}
                     />
 
                     <div>
@@ -223,7 +253,7 @@ function SignUpForm() {
                 <div className="mt-3 grid gap-3">
                   <label
                     className={`cursor-pointer rounded-xl border bg-white p-4 ${
-                      interpreterPath === "student"
+                      interpreterRole === "student_interpreter"
                         ? "border-[#2F6B4F]"
                         : "border-[#D1D5DB]"
                     }`}
@@ -231,10 +261,12 @@ function SignUpForm() {
                     <span className="flex items-start gap-3">
                       <input
                         type="radio"
-                        name="interpreterPath"
-                        value="student"
-                        checked={interpreterPath === "student"}
-                        onChange={() => setInterpreterPath("student")}
+                        name="interpreterRole"
+                        value="student_interpreter"
+                        checked={interpreterRole === "student_interpreter"}
+                        onChange={() =>
+                          setInterpreterRole("student_interpreter")
+                        }
                         required
                         className="mt-1"
                       />
@@ -251,7 +283,7 @@ function SignUpForm() {
 
                   <label
                     className={`cursor-pointer rounded-xl border bg-white p-4 ${
-                      interpreterPath === "mentor"
+                      interpreterRole === "mentor_interpreter"
                         ? "border-[#2F6B4F]"
                         : "border-[#D1D5DB]"
                     }`}
@@ -259,10 +291,12 @@ function SignUpForm() {
                     <span className="flex items-start gap-3">
                       <input
                         type="radio"
-                        name="interpreterPath"
-                        value="mentor"
-                        checked={interpreterPath === "mentor"}
-                        onChange={() => setInterpreterPath("mentor")}
+                        name="interpreterRole"
+                        value="mentor_interpreter"
+                        checked={interpreterRole === "mentor_interpreter"}
+                        onChange={() =>
+                          setInterpreterRole("mentor_interpreter")
+                        }
                         required
                         className="mt-1"
                       />
@@ -342,10 +376,10 @@ function SignUpForm() {
               />
               <span>
                 {isInterpreter
-                  ? interpreterPath === "student"
-                    ? "I agree to participate as an Advanced ITP student in this pro bono learning community, protect requester privacy, provide accurate profile information, and confirm my availability before accepting an assignment."
-                    : interpreterPath === "mentor"
-                      ? "I agree to participate as a Mentor Interpreter in this pro bono learning community, protect requester privacy, provide accurate profile information, support respectful student mentorship, and confirm my availability before accepting an assignment."
+                  ? interpreterRole === "student_interpreter"
+                    ? "I commit to participate as an Advanced ITP Student in this pro bono learning community, protect requester privacy, provide accurate profile information, and confirm my availability before accepting an assignment."
+                    : interpreterRole === "mentor_interpreter"
+                      ? "I commit to participate as a Mentor Interpreter in this pro bono learning community, protect requester privacy, provide accurate profile information, support respectful student mentorship, and confirm my availability before accepting an assignment."
                       : "Choose a volunteer profile above and review its commitment."
                   : "I understand that each request is supported by an Advanced ITP student and mentor, profile details are self-disclosed, and volunteer coverage cannot be guaranteed. I agree to protect the privacy of the people who serve my request."}
               </span>
