@@ -59,6 +59,56 @@ create unique index if not exists assignments_one_active_role_per_interpreter
 alter table public.interpreter_profiles
   add column if not exists professional_profile_url text;
 
+-- Normalize the legacy checkbox fields into mutually exclusive participation
+-- paths. Profiles with no prior choice remain unclassified and must choose a
+-- path the next time they save their profile.
+update public.interpreter_profiles
+set
+  willing_to_mentor = false,
+  willing_to_work_with_students = false
+where coalesce(is_advanced_itp_student, false) = true;
+
+update public.interpreter_profiles
+set
+  willing_to_mentor = true,
+  willing_to_work_with_students = true
+where coalesce(is_advanced_itp_student, false) = false
+  and (
+    coalesce(willing_to_mentor, false) = true
+    or coalesce(willing_to_work_with_students, false) = true
+  );
+
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'interpreter_profiles_participation_path_check'
+      and conrelid = 'public.interpreter_profiles'::regclass
+  ) then
+    alter table public.interpreter_profiles
+      add constraint interpreter_profiles_participation_path_check
+      check (
+        (
+          coalesce(is_advanced_itp_student, false) = true
+          and coalesce(willing_to_mentor, false) = false
+          and coalesce(willing_to_work_with_students, false) = false
+        )
+        or (
+          coalesce(is_advanced_itp_student, false) = false
+          and coalesce(willing_to_mentor, false) = true
+          and coalesce(willing_to_work_with_students, false) = true
+        )
+        or (
+          coalesce(is_advanced_itp_student, false) = false
+          and coalesce(willing_to_mentor, false) = false
+          and coalesce(willing_to_work_with_students, false) = false
+        )
+      );
+  end if;
+end
+$$;
+
 -- Retire new introduction-video uploads to avoid unnecessary storage growth.
 -- Existing private objects are preserved so nothing is destructively deleted.
 drop policy if exists "interpreter video owner upload" on storage.objects;
@@ -86,6 +136,7 @@ as $$
 declare
   requested_role public.user_role;
   commitment_signed_at timestamptz;
+  interpreter_path text;
 begin
   requested_role :=
     case new.raw_user_meta_data ->> 'role'
@@ -99,6 +150,13 @@ begin
         new.raw_user_meta_data ->> 'community_commitment_accepted',
         ''
       )) in ('true', '1', 'yes', 'on') then now()
+      else null
+    end;
+
+  interpreter_path :=
+    case new.raw_user_meta_data ->> 'interpreter_path'
+      when 'student' then 'student'
+      when 'mentor' then 'mentor'
       else null
     end;
 
@@ -127,9 +185,18 @@ begin
   if requested_role = 'interpreter'::public.user_role then
     insert into public.interpreter_profiles (
       profile_id,
-      pro_bono_signed_at
+      pro_bono_signed_at,
+      is_advanced_itp_student,
+      willing_to_mentor,
+      willing_to_work_with_students
     )
-    values (new.id, commitment_signed_at)
+    values (
+      new.id,
+      commitment_signed_at,
+      coalesce(interpreter_path = 'student', false),
+      coalesce(interpreter_path = 'mentor', false),
+      coalesce(interpreter_path = 'mentor', false)
+    )
     on conflict (profile_id) do nothing;
   else
     insert into public.requestor_profiles (
