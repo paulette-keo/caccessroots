@@ -158,16 +158,26 @@ export async function saveInterpreterProfileAction(
     );
   }
 
-  const willing_to_mentor =
-    formData.get("willing_to_mentor") === "on";
+  const interpreterPath = String(
+    formData.get("interpreter_path") ?? ""
+  );
 
-  const willing_to_work_with_students =
-    formData.get(
-      "willing_to_work_with_students"
-    ) === "on";
+  if (interpreterPath !== "student" && interpreterPath !== "mentor") {
+    throw new Error("Choose Advanced ITP Student or Mentor Interpreter.");
+  }
 
-  const is_advanced_itp_student =
-    formData.get("is_advanced_itp_student") === "yes";
+  const is_advanced_itp_student = interpreterPath === "student";
+  const willing_to_mentor = interpreterPath === "mentor";
+  const willing_to_work_with_students = interpreterPath === "mentor";
+
+  if (
+    interpreterPath === "mentor" &&
+    formData.get("mentor_commitment") !== "on"
+  ) {
+    throw new Error(
+      "Confirm that you agree to support Advanced ITP students as a Mentor Interpreter."
+    );
+  }
 
   const college_name = is_advanced_itp_student
     ? String(

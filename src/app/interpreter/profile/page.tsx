@@ -3,8 +3,8 @@ import { requireProfile } from "@/lib/auth";
 import { createInterpreterPhotoUrl } from "@/lib/interpreter-photos";
 import { saveInterpreterProfileAction } from "./actions";
 import { ProfileMediaUploader } from "./profile-media-uploader";
-import { StudentStatusFields } from "./student-status-fields";
 import { CertificationFields } from "./certification-fields";
+import { InterpreterPathFields } from "./interpreter-path-fields";
 
 const AVAILABLE_DAYS = [
   ["monday", "Monday"],
@@ -42,10 +42,23 @@ export default async function InterpreterProfilePage({
       row?.profile_photo_path
     );
 
+  const interpreterPath = row?.is_advanced_itp_student
+    ? "student"
+    : row?.willing_to_mentor || row?.willing_to_work_with_students
+      ? "mentor"
+      : null;
+
+  const profileHeading =
+    interpreterPath === "student"
+      ? "My Advanced ITP Student profile"
+      : interpreterPath === "mentor"
+        ? "My Mentor Interpreter profile"
+        : "My interpreter profile";
+
   return (
     <div className="max-w-2xl">
       <h1 className="text-2xl font-semibold">
-        My interpreter profile
+        {profileHeading}
       </h1>
 
       <p className="text-ink-muted mt-1">
@@ -66,6 +79,11 @@ export default async function InterpreterProfilePage({
   action={saveInterpreterProfileAction}
         className="card p-6 mt-6 space-y-4"
       >
+        <InterpreterPathFields
+          defaultPath={interpreterPath}
+          defaultCollegeName={row?.college_name ?? ""}
+        />
+
         <div>
           <label
             className="label"
@@ -403,52 +421,6 @@ export default async function InterpreterProfilePage({
             Requesters and coordinators can open this link when reviewing a team match.
           </p>
         </div>
-
-        <StudentStatusFields
-          defaultIsAdvancedItpStudent={
-            row?.is_advanced_itp_student ?? false
-          }
-          defaultCollegeName={row?.college_name ?? ""}
-        />
-  
-        <fieldset className="rounded-xl border border-slate-200 p-4 space-y-3">
-          <legend className="px-2 text-sm font-medium">
-            Mentorship and student support
-          </legend>
-
-          <label className="flex items-start gap-2 text-sm">
-            <input
-              type="checkbox"
-              name="willing_to_mentor"
-              defaultChecked={
-                row?.willing_to_mentor ?? false
-              }
-              className="mt-1"
-            />
-
-            <span>
-              I am willing to mentor another
-              interpreter.
-            </span>
-          </label>
-
-          <label className="flex items-start gap-2 text-sm">
-            <input
-              type="checkbox"
-              name="willing_to_work_with_students"
-              defaultChecked={
-                row?.willing_to_work_with_students ??
-                false
-              }
-              className="mt-1"
-            />
-
-            <span>
-              I am willing to work with approved
-              interpreting students.
-            </span>
-          </label>
-        </fieldset>
 
         <div>
           <label
