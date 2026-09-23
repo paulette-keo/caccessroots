@@ -7,6 +7,8 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { Wordmark } from "@/components/wordmark";
 import type { UserRole } from "@/lib/types";
 
+type InterpreterPath = "student" | "mentor";
+
 const ROLES: {
   value: UserRole;
   label: string;
@@ -48,6 +50,8 @@ function SignUpForm() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [interpreterPath, setInterpreterPath] =
+    useState<InterpreterPath | null>(null);
   const [commitmentAccepted, setCommitmentAccepted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -55,6 +59,12 @@ function SignUpForm() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    if (role === "interpreter" && !interpreterPath) {
+      setError("Choose Advanced ITP Student or Mentor Interpreter.");
+      return;
+    }
+
     setLoading(true);
 
     const supabase = createSupabaseBrowserClient();
@@ -66,6 +76,8 @@ function SignUpForm() {
         data: {
           full_name: fullName.trim(),
           role,
+          interpreter_path:
+            role === "interpreter" ? interpreterPath : null,
           community_commitment_accepted: commitmentAccepted,
         },
       },
@@ -195,6 +207,79 @@ function SignUpForm() {
           )}
 
           <form onSubmit={onSubmit} className="mt-6 space-y-4">
+            {isInterpreter && (
+              <fieldset className="rounded-xl border border-[#B7D8C4] bg-[#EDF7F1] p-4">
+                <legend className="px-2 text-sm font-semibold">
+                  Volunteer profile
+                </legend>
+
+                <p className="text-sm font-medium text-[#0A0D12]">
+                  How will you participate?
+                </p>
+                <p className="mt-1 text-xs text-[#6B7280]">
+                  Each request is supported by one student and one mentor.
+                </p>
+
+                <div className="mt-3 grid gap-3">
+                  <label
+                    className={`cursor-pointer rounded-xl border bg-white p-4 ${
+                      interpreterPath === "student"
+                        ? "border-[#2F6B4F]"
+                        : "border-[#D1D5DB]"
+                    }`}
+                  >
+                    <span className="flex items-start gap-3">
+                      <input
+                        type="radio"
+                        name="interpreterPath"
+                        value="student"
+                        checked={interpreterPath === "student"}
+                        onChange={() => setInterpreterPath("student")}
+                        required
+                        className="mt-1"
+                      />
+                      <span>
+                        <span className="block font-medium">
+                          Advanced ITP Student
+                        </span>
+                        <span className="mt-1 block text-xs text-[#6B7280]">
+                          I will participate with an experienced mentor.
+                        </span>
+                      </span>
+                    </span>
+                  </label>
+
+                  <label
+                    className={`cursor-pointer rounded-xl border bg-white p-4 ${
+                      interpreterPath === "mentor"
+                        ? "border-[#2F6B4F]"
+                        : "border-[#D1D5DB]"
+                    }`}
+                  >
+                    <span className="flex items-start gap-3">
+                      <input
+                        type="radio"
+                        name="interpreterPath"
+                        value="mentor"
+                        checked={interpreterPath === "mentor"}
+                        onChange={() => setInterpreterPath("mentor")}
+                        required
+                        className="mt-1"
+                      />
+                      <span>
+                        <span className="block font-medium">
+                          Mentor Interpreter
+                        </span>
+                        <span className="mt-1 block text-xs text-[#6B7280]">
+                          I will serve alongside and support an Advanced ITP student.
+                        </span>
+                      </span>
+                    </span>
+                  </label>
+                </div>
+              </fieldset>
+            )}
+
             <div>
               <label className="label" htmlFor="fullName">
                 Full name
@@ -257,7 +342,11 @@ function SignUpForm() {
               />
               <span>
                 {isInterpreter
-                  ? "I agree to participate in this pro bono learning community, protect requester privacy, provide accurate profile information, and confirm my availability before accepting a student or mentor assignment."
+                  ? interpreterPath === "student"
+                    ? "I agree to participate as an Advanced ITP student in this pro bono learning community, protect requester privacy, provide accurate profile information, and confirm my availability before accepting an assignment."
+                    : interpreterPath === "mentor"
+                      ? "I agree to participate as a Mentor Interpreter in this pro bono learning community, protect requester privacy, provide accurate profile information, support respectful student mentorship, and confirm my availability before accepting an assignment."
+                      : "Choose a volunteer profile above and review its commitment."
                   : "I understand that each request is supported by an Advanced ITP student and mentor, profile details are self-disclosed, and volunteer coverage cannot be guaranteed. I agree to protect the privacy of the people who serve my request."}
               </span>
             </label>
