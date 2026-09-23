@@ -38,10 +38,10 @@ export const COVERAGE_RESPONSES = [
 export const REQUEST_STATUS_LABELS: Record<string, string> = {
   draft: "Draft",
   pending_review: "Under review",
-  open: "Open",
-  proposed: "Your response needed",
-  pending_acceptance: "Awaiting interpreter response",
-  assigned: "Matched",
+  open: "Coordinator building team",
+  proposed: "Coordinator building team",
+  pending_acceptance: "Confirming team availability",
+  assigned: "Student and mentor confirmed",
   completed: "Completed",
   cancelled: "Closed",
 };

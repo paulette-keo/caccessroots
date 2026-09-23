@@ -1,10 +1,37 @@
+import Link from "next/link";
+import { requireProfile } from "@/lib/auth";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createRequestAction } from "./actions";
 import {
   COVERAGE_RESPONSES,
   EVENT_TYPES,
 } from "@/lib/request-workflow";
 
-export default function NewRequestPage() {
+export default async function NewRequestPage() {
+  const profile = await requireProfile();
+  const supabase = createSupabaseServerClient();
+  const { data: requestorProfile } = await supabase
+    .from("requestor_profiles")
+    .select("community_commitment_signed_at")
+    .eq("profile_id", profile.id)
+    .maybeSingle();
+
+  if (!requestorProfile?.community_commitment_signed_at) {
+    return (
+      <div className="max-w-2xl">
+        <h1 className="text-2xl font-semibold">Complete your profile first</h1>
+        <div className="card mt-6 border-l-4 border-amber-400 p-6">
+          <p className="text-sm text-ink-muted">
+            Before submitting a request, review and accept the requester community commitments on your profile.
+          </p>
+          <Link href="/requestor/profile" className="btn-primary mt-4 inline-block">
+            Complete requester profile
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-2xl">
       <h1 className="text-2xl font-semibold">
@@ -20,36 +47,6 @@ export default function NewRequestPage() {
         action={createRequestAction}
         className="card p-6 space-y-4 mt-6"
       >
-        <div className="rounded-xl border-l-4 border-[#2F6B4F] bg-[#EDF7F1] p-4 text-sm leading-relaxed text-[#374151]">
-          <p className="font-semibold text-[#0A0D12]">
-            Platform disclaimer
-          </p>
-
-          <p className="mt-1">
-            CAccessRoots provides the platform, interpreters provide their
-            details, and the system facilitates matching. Profile details are
-            self-disclosed; CAccessRoots does not conduct an in-depth vetting
-            process and cannot guarantee coverage. Coverage depends on whether
-            local interpreters volunteer to provide pro bono services. If no
-            one offers, our volunteers will send a call out to all publicly
-            registered RID members—Associate and Certified—in your local area.
-          </p>
-
-          <label className="mt-3 flex items-start gap-2 font-medium">
-            <input
-              type="checkbox"
-              name="disclaimer_accepted"
-              value="yes"
-              required
-              className="mt-1"
-            />
-
-            <span>
-              I understand and want to continue.
-            </span>
-          </label>
-        </div>
-
         <fieldset className="rounded-xl border border-slate-200 p-4">
           <legend className="px-2 text-sm font-medium">
             Is another organization responsible for providing access?
@@ -280,8 +277,8 @@ export default function NewRequestPage() {
                 <span className="font-medium">
                   Standard.
                 </span>{" "}
-                A coordinator can propose a nearby interpreter for you to
-                approve.
+                A coordinator will invite an Advanced ITP student and mentor.
+                Both people confirm availability before the team is final.
               </span>
             </label>
 
@@ -299,8 +296,8 @@ export default function NewRequestPage() {
                 </span>{" "}
                 Funeral, family conflict, a first meeting, or another intimate
                 context. A coordinator and admin will review the category
-                before proposing a match to you. You do not need to explain why
-                it is sensitive.
+                before team matching begins. You do not need to explain why it
+                is sensitive.
               </span>
             </label>
           </div>
@@ -342,48 +339,9 @@ export default function NewRequestPage() {
           </div>
         </fieldset>
 
-        <fieldset className="rounded-xl border border-slate-200 p-4">
-          <legend className="px-2 text-sm font-medium">
-            Are you willing to be matched with an Advanced ITP student?
-          </legend>
-
-          <p className="mb-3 text-xs leading-relaxed text-ink-muted">
-            Student status and college or ITP program information are
-            self-disclosed and clearly shown before you approve a proposed
-            match. Selecting No will prevent student profiles from being
-            proposed for this request.
-          </p>
-
-          <div className="space-y-2 text-sm">
-            <label className="flex items-start gap-2">
-              <input
-                type="radio"
-                name="student_interpreter_allowed"
-                value="yes"
-                required
-                className="mt-1"
-              />
-
-              <span>
-                Yes, I am open to an Advanced ITP student.
-              </span>
-            </label>
-
-            <label className="flex items-start gap-2">
-              <input
-                type="radio"
-                name="student_interpreter_allowed"
-                value="no"
-                required
-                className="mt-1"
-              />
-
-              <span>
-                No, do not propose an Advanced ITP student.
-              </span>
-            </label>
-          </div>
-        </fieldset>
+        <div className="rounded-xl border border-[#B7D8C4] bg-[#EDF7F1] p-4 text-sm text-[#374151]">
+          Each request is supported by a learning team: one Advanced ITP student and one mentor interpreter. The coordinator confirms both people are available before the team is finalized.
+        </div>
 
         <p className="text-xs text-ink-muted">
           Reminder: interpreters on your blocklist will never see this request.

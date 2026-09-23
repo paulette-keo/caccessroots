@@ -12,7 +12,7 @@ and contracts don't reach.
 
 ## What it does
 
-Five roles, each with their own dashboard.
+Four roles, each with their own dashboard.
 
 **Requestor (Deaf community member).** Submit a request with event details and
 an address. Mark it as Sensitive if the context is intimate (family, medical
@@ -20,24 +20,19 @@ with a minor, funeral, legal). Maintain a private conflict-of-interest
 blocklist; interpreters on the list never see your request.
 
 **Interpreter (volunteer).** Set your home address, service radius, languages,
-modalities, and sign your pro bono commitment. See open requests within your
-radius (filtered by the COI blocklist at the database level). Accept or
-decline assignments coordinators release to you.
+modalities, student/mentor status, and sign your community commitment. Accept
+or decline invitations coordinators release to you. Every request is staffed
+by one Advanced ITP student and one mentor.
 
 **Coordinator.** See the queue of open requests, click into one, see ranked
 recommended interpreters with COI excluded, language match, radius check,
-distance, workload, and a composite fit score. Propose an assignment. For
-standard-sensitivity requests, the proposal goes straight to the interpreter
-for accept/decline. For sensitive requests, the proposal goes to an admin for
-release first.
+distance, workload, and a composite fit score. Invite one Advanced ITP student
+and one mentor. Each person confirms availability; if either declines, that
+role returns to the coordinator without removing the other confirmed person.
 
-**Admin.** Top-level oversight. Approve new interpreters and partner
-communities. Release sensitive assignments. Suspend or reinstate users.
-Propose and second-key role escalations. View the full audit log. Manage
-partner communities.
-
-**Partner Community Admin.** Scoped to their community. Vouch for community
-members. See community activity at a high level.
+**Admin.** Top-level oversight. Approve new interpreters and review requests
+that require extra care. Suspend or reinstate users. Propose and second-key
+role escalations. View the full audit log.
 
 ## Why these design choices
 
@@ -51,10 +46,9 @@ match, and a fit score. There's no client-side trust boundary to compromise.
 Even if someone hits the API directly with an anon key, they cannot see a
 requestor's blocklist, a sensitive request, or another user's profile.
 
-**Sensitive-request guard at the database.** When a coordinator proposes an
-assignment for a sensitive request, a trigger downgrades the status to
-`pending_admin_release` regardless of how it was submitted. Admin must
-explicitly release it before any interpreter is contacted.
+**Sensitive-request review.** Sensitive requests enter the admin review queue
+before the coordinator can build a team. Interpreters see only assignments
+released specifically to them.
 
 **Two-key for role escalation.** Promoting someone to coordinator or admin
 requires two different admin approvals — no one promotes themselves or a buddy

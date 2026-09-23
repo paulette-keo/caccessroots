@@ -19,8 +19,8 @@ export default async function CoordinatorQueue() {
         <div>
           <h1 className="text-2xl font-semibold">Request queue</h1>
           <p className="text-ink-muted mt-1">
-            Requests in chronological order. Only Open requests can be matched;
-            the COI blocklist is applied before recommendations are shown.
+            Build each student-and-mentor team and track availability responses.
+            The COI blocklist is applied before recommendations are shown.
           </p>
         </div>
         <Link href="/coordinator/map" className="btn-secondary">View map</Link>
@@ -65,7 +65,9 @@ export default async function CoordinatorQueue() {
                 </td>
                 <td className="px-4 py-3 text-right">
                   <Link href={`/coordinator/requests/${r.id}`} className="btn-primary text-xs py-1 px-2">
-                    {r.status === "open" ? "Match" : "View"}
+                    {["open", "pending_acceptance"].includes(r.status)
+                      ? "Build team"
+                      : "View"}
                   </Link>
                 </td>
               </tr>

@@ -51,12 +51,13 @@ document (a sticky note app works fine):
 
 1. In your Supabase project's left sidebar, click **SQL Editor**.
 2. Click **+ New query**.
-3. Open the file `supabase/migrations/0001_initial_schema.sql` from the
-   project folder on your computer. Open it in TextEdit or any text editor.
-4. Copy the **entire contents** of that file.
-5. Paste it into the Supabase SQL Editor and click **Run** (bottom right).
-   Wait for the green "Success" message.
-6. Repeat for `0002_map_helpers.sql`. New query, copy contents, paste, Run.
+3. Open the `supabase/migrations` folder in the project.
+4. Starting with `0001_initial_schema.sql`, copy the **entire contents** of
+   each numbered SQL file.
+5. Paste each file into a fresh Supabase SQL Editor query and click **Run**.
+   Wait for the green "Success" message before moving to the next file.
+6. Continue in number order through the newest migration. Do not skip files;
+   later workflow and security changes depend on the earlier migrations.
 
 That's the entire database set up — tables, security policies, the matching
 engine, the audit log, everything.
@@ -189,20 +190,32 @@ admin access through the normal sign-up flow.
 
 ## Things to know after you ship
 
-**Free tier limits.** Supabase free tier supports up to 50,000 monthly active
-users and 500 MB of database, which is plenty for years of pro bono work.
-Vercel free tier covers 100 GB of bandwidth a month. Mapbox covers 50,000
-map loads. You won't hit these for a long time, but Supabase will warn you
-when you get close.
+**Capacity and upgrade triggers (checked September 2026).** The app no longer
+accepts introduction-video uploads; profile photos are capped at 5 MB and
+professional/practicum pages are stored as links. Supabase Free currently
+includes 500 MB of database data, 1 GB of file storage, 50,000 monthly active
+users, and 5 GB each of cached and uncached egress. Supabase Pro starts at
+$25/month and is the sensible upgrade before the database, storage, or egress
+allowance is consistently close to full, or when the pilot needs automatic
+backups and a project that will not pause after inactivity. Vercel Hobby is
+intended for personal, non-commercial use; use the Vercel plan shown in the
+KEO workspace. Its current included usage includes 100 GB of Fast Data
+Transfer, 4 active CPU hours, and 1,000,000 function invocations. Move to Pro
+for organizational production use, team collaboration, or higher usage.
+Vercel Pro currently has a $20/month platform fee with one deploying team seat
+included. Check the [Supabase pricing page](https://supabase.com/pricing),
+[Vercel plan page](https://vercel.com/docs/plans), and both usage dashboards
+monthly because limits and prices can change.
 
 **Updating the code.** If you want to make a change (text, color, anything),
 tell me what you want changed. I'll update the code. Then in GitHub's web
 interface, find the file, click the pencil-edit icon, paste in the new
 contents, commit. Vercel auto-deploys within a minute.
 
-**Backups.** Supabase takes automatic daily backups on the free tier. You
-can also download a full database export anytime from
-**Database → Backups → Download backup**.
+**Backups.** Supabase Free does not include automatic database backups. Before
+the pilot, either move the production project to a plan with backups or create
+and test a documented manual export routine. Do not assume a backup exists
+until a restore has been tested.
 
 **Custom domain.** If you want `caccessroots.org` instead of
 `caccessroots.vercel.app`, buy the domain (Namecheap, Cloudflare, etc.) and

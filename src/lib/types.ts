@@ -29,6 +29,7 @@ export type AssignmentStatus =
   | "declined"
   | "completed"
   | "cancelled";
+export type AssignmentRole = "student" | "mentor";
 
 export type ApprovalKind =
   | "interpreter_onboarding"
@@ -85,6 +86,7 @@ export interface InterpreterProfile {
   profile_photo_path: string | null;
   intro_video_url: string | null;
   intro_video_path: string | null;
+  professional_profile_url: string | null;
   willing_to_mentor: boolean;
   willing_to_work_with_students: boolean;
   is_advanced_itp_student: boolean;
@@ -100,6 +102,8 @@ export interface RequestorProfile {
   primary_community_id: string | null;
   contact_preference: string | null;
   notes: string | null;
+  community_commitment_signed_at: string | null;
+  community_commitment_version: string | null;
 }
 
 export interface InterpreterRecommendation {
@@ -141,6 +145,7 @@ export interface Assignment {
   id: string;
   request_id: string;
   interpreter_id: string;
+  team_role: AssignmentRole;
   status: AssignmentStatus;
   proposed_by: string;
   released_by: string | null;

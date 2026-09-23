@@ -57,10 +57,10 @@ export default function LandingPage() {
               </p>
 
               <p>
-                CAccessRoots connects Deaf people with volunteer interpreters
-                who volunteer their time for these moments. No agency. No
-                invoice. No contract. Just people showing up for each other,
-                the way this work started.
+                CAccessRoots is a community of learning and practice. Advanced
+                ITP students team with experienced mentor interpreters to serve
+                pro bono requests—meeting needs today while supporting the next
+                generation of community interpreters.
               </p>
             </div>
 
@@ -115,8 +115,8 @@ export default function LandingPage() {
               />
 
               <Feature
-                title="Rooted in community"
-                desc="Deaf organizations can vouch for their members and see what’s happening locally. This grows through people who already know each other."
+                title="A student and mentor team"
+                desc="Every request brings an Advanced ITP student together with an experienced mentor. Both confirm availability before the team is final."
               />
             </ul>
           </div>
@@ -190,8 +190,9 @@ export default function LandingPage() {
           <div className="grid gap-6 md:grid-cols-2">
             <ExpectationCard title="Before you request">
               <p>
-                Every interpreter here is volunteering. There’s no fee, and
-                there’s no guarantee. We’ll do our best to find a match.
+                Your request becomes part of a community learning opportunity.
+                A coordinator assembles an Advanced ITP student and mentor team
+                and confirms that both people are available.
               </p>
 
               <p>
@@ -207,16 +208,16 @@ export default function LandingPage() {
               </p>
 
               <p>
-                Once you’re matched, share what your interpreter should know.
-                Names, signs, family dynamics, anything that helps them serve
-                you well.
+                Once your team is confirmed, share what they should know. Names,
+                signs, family dynamics, and anything that helps them serve you
+                well can stay within the assignment.
               </p>
             </ExpectationCard>
 
             <ExpectationCard title="Before you volunteer">
               <p>
-                These are unpaid assignments. Nothing here is billable, and no
-                one will ask you to invoice.
+                Students and mentors serve side by side. Students gain supported
+                practice, and experienced interpreters help guide the work.
               </p>
 
               <p>
@@ -225,8 +226,8 @@ export default function LandingPage() {
               </p>
 
               <p>
-                Coordination is handled by volunteers and ITP students learning
-                the work. Grace goes both directions.
+                Set an honest service radius and availability. You will always
+                confirm that you can attend before the team is finalized.
               </p>
             </ExpectationCard>
           </div>
