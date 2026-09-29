@@ -4,7 +4,6 @@ import { createInterpreterPhotoUrl } from "@/lib/interpreter-photos";
 import { saveInterpreterProfileAction } from "./actions";
 import { ProfileMediaUploader } from "./profile-media-uploader";
 import { CertificationFields } from "./certification-fields";
-import { InterpreterPathFields } from "./interpreter-path-fields";
 
 const AVAILABLE_DAYS = [
   ["monday", "Monday"],
@@ -42,18 +41,13 @@ export default async function InterpreterProfilePage({
       row?.profile_photo_path
     );
 
-  const interpreterPath = row?.is_advanced_itp_student
-    ? "student"
-    : row?.willing_to_mentor || row?.willing_to_work_with_students
-      ? "mentor"
-      : null;
-
-  const profileHeading =
-    interpreterPath === "student"
-      ? "My Advanced ITP Student profile"
-      : interpreterPath === "mentor"
-        ? "My Mentor Interpreter profile"
-        : "My interpreter profile";
+  const isStudent =
+    profile.role === "student_interpreter" ||
+    (profile.role === "interpreter" &&
+      row?.is_advanced_itp_student === true);
+  const profileHeading = isStudent
+    ? "My Student Interpreter Profile"
+    : "My Mentor Interpreter Profile";
 
   return (
     <div className="max-w-2xl">
@@ -79,10 +73,21 @@ export default async function InterpreterProfilePage({
   action={saveInterpreterProfileAction}
         className="card p-6 mt-6 space-y-4"
       >
-        <InterpreterPathFields
-          defaultPath={interpreterPath}
-          defaultCollegeName={row?.college_name ?? ""}
-        />
+        {isStudent && (
+          <div>
+            <label className="label" htmlFor="college_name">
+              College or ITP program
+            </label>
+            <input
+              id="college_name"
+              name="college_name"
+              required
+              className="input"
+              defaultValue={row?.college_name ?? ""}
+              placeholder="College or ITP program"
+            />
+          </div>
+        )}
 
         <div>
           <label

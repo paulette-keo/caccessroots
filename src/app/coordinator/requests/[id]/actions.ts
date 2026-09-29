@@ -46,8 +46,21 @@ export async function inviteTeamMemberAction(formData: FormData) {
     .eq("id", interpreterId)
     .single();
   if (interpreterError) throw new Error(interpreterError.message);
-  if (interpreter.role !== "interpreter" || interpreter.status !== "active") {
-    throw new Error("This interpreter is not active");
+  const requiredAccountRole =
+    teamRole === "student"
+      ? "student_interpreter"
+      : "mentor_interpreter";
+
+  if (
+    ![
+      requiredAccountRole,
+      "interpreter",
+    ].includes(interpreter.role) ||
+    interpreter.status !== "active"
+  ) {
+    throw new Error(
+      `Only an active ${teamRole} interpreter account can fill this role`
+    );
   }
 
   const { data: interpreterProfile, error: profileError } = await supabase

@@ -1,5 +1,6 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createInterpreterPhotoUrl } from "@/lib/interpreter-photos";
+import { userRoleLabel } from "@/lib/types";
 
 export default async function InterpretersDirectoryPage() {
   const supabase =
@@ -9,9 +10,13 @@ export default async function InterpretersDirectoryPage() {
     await supabase
       .from("profiles")
       .select(
-        "id,full_name,email,status,interp:interpreter_profiles(home_address,service_radius_miles,languages,credentials,is_certified,certifications,licenses,specialties,experience_band,profile_photo_path,professional_profile_url,willing_to_mentor,willing_to_work_with_students,is_advanced_itp_student,college_name,accepting_requests,available_days,preferred_time_blocks,unavailable_until,total_completed,pro_bono_signed_at)"
+        "id,full_name,email,role,status,interp:interpreter_profiles(home_address,service_radius_miles,languages,credentials,is_certified,certifications,licenses,specialties,experience_band,profile_photo_path,professional_profile_url,willing_to_mentor,willing_to_work_with_students,is_advanced_itp_student,college_name,accepting_requests,available_days,preferred_time_blocks,unavailable_until,total_completed,pro_bono_signed_at)"
       )
-      .eq("role", "interpreter")
+      .in("role", [
+        "student_interpreter",
+        "mentor_interpreter",
+        "interpreter",
+      ])
       .order("full_name");
 
   const interpreterRows = await Promise.all(
@@ -107,6 +112,10 @@ export default async function InterpretersDirectoryPage() {
                       <p className="text-xs text-ink-muted">
                         {p.email}
                       </p>
+
+                      <span className="badge mt-1 bg-brand-50 text-brand-700">
+                        {userRoleLabel(p.role)}
+                      </span>
                     </div>
                   </div>
                 </td>
