@@ -458,7 +458,7 @@ export default async function InterpreterProfilePage({
           />
 
             <span>
-              I commit to this pro bono learning community. I will provide
+              {isStudent ? "I commit to participate as an Advanced ITP Student in this pro bono learning community." : "I commit to participate as a Mentor Interpreter in this pro bono learning community."} I will provide
               accurate profile details, protect requester privacy, confirm my
               availability before accepting an assignment, support respectful
               student-and-mentor teamwork, and recuse myself from conflicts.
