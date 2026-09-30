@@ -381,7 +381,7 @@ function SignUpForm() {
                     : interpreterRole === "mentor_interpreter"
                       ? "I commit to participate as a Mentor Interpreter in this pro bono learning community, protect requester privacy, provide accurate profile information, support respectful student mentorship, and confirm my availability before accepting an assignment."
                       : "Choose a volunteer profile above and review its commitment."
-                  : "I understand that each request is supported by an Advanced ITP student and mentor, profile details are self-disclosed, and volunteer coverage cannot be guaranteed. I agree to protect the privacy of the people who serve my request."}
+                  : "I understand that each request is supported by an Advanced ITP student and mentor, profile details are self-disclosed, and volunteer coverage cannot be guaranteed. I commit to protecting the privacy of the people who serve my request."}
               </span>
             </label>
 
