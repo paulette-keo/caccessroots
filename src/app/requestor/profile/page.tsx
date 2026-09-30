@@ -65,7 +65,7 @@ export default async function RequestorProfilePage({
               defaultChecked={Boolean(row?.community_commitment_signed_at)}
               className="mt-1"
             />
-            <span>I agree to these requester community commitments.</span>
+            <span>I commit to these requester community responsibilities.</span>
           </label>
         </fieldset>
 
