@@ -126,7 +126,7 @@ Your code is now on GitHub.
 4. Find `caccessroots` in your repository list and click **Import**.
 5. Vercel will detect it's a Next.js project automatically. Don't change
    any build settings.
-6. Expand **Environment Variables**. You'll add five:
+6. Expand **Environment Variables**. Add the core application variables:
 
 | Name | Value |
 |---|---|
@@ -135,6 +135,18 @@ Your code is now on GitHub.
 | `SUPABASE_SERVICE_ROLE_KEY` | (from Supabase, the service_role key) |
 | `NEXT_PUBLIC_MAPBOX_TOKEN` | (from Mapbox, the pk. token) |
 | `NEXT_PUBLIC_APP_URL` | leave empty for now, we'll fill after deploy |
+
+To enable workflow email notifications, also add:
+
+| Name | Value |
+|---|---|
+| `RESEND_API_KEY` | server-only API key from Resend |
+| `NOTIFICATION_FROM_EMAIL` | verified sender, such as `CAccessRoots <notifications@caccessroots.org>` |
+| `NOTIFICATION_REPLY_TO` | optional monitored reply address |
+
+The sender domain must be verified in Resend. Until these values are present,
+the core website remains functional and notification attempts are safely
+skipped.
 
 7. Click **Deploy**. It takes ~2 minutes.
 
