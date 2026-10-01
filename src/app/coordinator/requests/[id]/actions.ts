@@ -2,7 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import {
+  createSupabaseServerClient,
+  createSupabaseServiceClient,
+} from "@/lib/supabase/server";
+import {
+  sendWorkflowEmail,
+  workflowRoleLabel,
+} from "@/lib/workflow-notifications";
 
 const ACTIVE_ASSIGNMENT_STATUSES = [
   "proposed",
@@ -137,6 +144,24 @@ export async function inviteTeamMemberAction(formData: FormData) {
         ...assignmentValues,
       });
   if (saveError) throw new Error(saveError.message);
+
+  const service = createSupabaseServiceClient();
+  const { data: recipient } = await service
+    .from("profiles")
+    .select("email")
+    .eq("id", interpreterId)
+    .maybeSingle();
+
+  if (recipient?.email) {
+    await sendWorkflowEmail({
+      to: recipient.email,
+      subject: `CAccessRoots ${workflowRoleLabel(teamRole)} invitation`,
+      heading: "You have a new volunteer invitation",
+      message: `A coordinator invited you to participate as the ${workflowRoleLabel(teamRole)}. Please sign in to review the request and confirm whether you are available.`,
+      actionLabel: "Review invitation",
+      actionPath: "/interpreter/assignments",
+    });
+  }
 
   revalidatePath("/coordinator");
   revalidatePath(`/coordinator/requests/${requestId}`);

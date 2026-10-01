@@ -132,6 +132,18 @@ cp .env.local.example .env.local
 # fill in the values
 ```
 
+To enable workflow email notifications, also configure:
+
+- `RESEND_API_KEY` — a server-only Resend API key
+- `NOTIFICATION_FROM_EMAIL` — a verified sender, such as
+  `CAccessRoots <notifications@caccessroots.org>`
+- `NOTIFICATION_REPLY_TO` — optional monitored reply address
+
+Notifications intentionally contain only a status summary and authenticated
+link. Event details remain inside CAccessRoots. Missing email configuration or
+a provider outage never prevents an invitation, response, withdrawal, or
+approval from being saved.
+
 ### 6. Run it
 
 ```bash
@@ -173,8 +185,7 @@ runs.
 
 A handful of features were scoped out of the MVP. Each is easy to add on top:
 
-- Email/SMS notifications when a request status changes (Resend, Twilio, or
-  Supabase's outgoing email hooks).
+- SMS notifications when a request status changes (for example, Twilio).
 - Travel-time isochrones overlaid on the coordinator map (Mapbox Isochrone API
   — `src/lib/geocode.ts` already includes `travelMinutes` you can extend).
 - File attachments on requests (Supabase Storage with RLS).
