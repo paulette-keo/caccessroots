@@ -1,7 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import {
+  createSupabaseServerClient,
+  createSupabaseServiceClient,
+} from "@/lib/supabase/server";
+import { sendWorkflowEmail } from "@/lib/workflow-notifications";
 
 // Decide an approval. `slot` is 'first' or 'second' (for two-key items).
 export async function decideApprovalAction(formData: FormData) {
@@ -62,6 +66,10 @@ export async function decideApprovalAction(formData: FormData) {
     await applyRejectionSideEffect(supabase, approval);
   }
 
+  if (final !== "pending") {
+    await notifyApprovalOutcome(approval, final);
+  }
+
   // Audit
   await supabase.rpc("write_audit", {
     p_action: `approval.${decision}.${isFirst ? "first" : "second"}`,
@@ -74,6 +82,87 @@ export async function decideApprovalAction(formData: FormData) {
 
   revalidatePath("/admin/approvals");
   revalidatePath("/admin");
+}
+
+async function notifyApprovalOutcome(
+  approval: any,
+  decision: "approved" | "rejected"
+) {
+  const service = createSupabaseServiceClient();
+  let recipientEmail: string | null = null;
+  let subject = "CAccessRoots review decision";
+  let heading =
+    decision === "approved" ? "Your review was approved" : "Your review was closed";
+  let message =
+    decision === "approved"
+      ? "The review is complete and the next step is available in your CAccessRoots account."
+      : "The review is complete and the item will not move forward. Sign in to review its current status.";
+  let actionPath = "/dashboard";
+
+  if (
+    approval.kind === "interpreter_onboarding" ||
+    approval.kind === "reinstatement" ||
+    approval.kind === "role_escalation"
+  ) {
+    const profileId = approval.context?.profile_id || approval.target_id;
+    const { data: profile } = await service
+      .from("profiles")
+      .select("email")
+      .eq("id", profileId)
+      .maybeSingle();
+    recipientEmail = profile?.email ?? null;
+    subject =
+      decision === "approved"
+        ? "Your CAccessRoots volunteer account is approved"
+        : "Your CAccessRoots volunteer account review is complete";
+    heading =
+      decision === "approved"
+        ? "Your volunteer account is active"
+        : "Your volunteer account was not approved";
+    message =
+      decision === "approved"
+        ? "You can now sign in, complete your profile, and receive Student or Mentor invitations."
+        : "Your account review is complete and the account was not activated. Please contact the program team if you have questions.";
+    actionPath = "/sign-in";
+  } else if (approval.kind === "request_review") {
+    const { data: request } = await service
+      .from("requests")
+      .select("requestor_id")
+      .eq("id", approval.target_id)
+      .maybeSingle();
+    if (request?.requestor_id) {
+      const { data: requestor } = await service
+        .from("profiles")
+        .select("email")
+        .eq("id", request.requestor_id)
+        .maybeSingle();
+      recipientEmail = requestor?.email ?? null;
+    }
+    subject =
+      decision === "approved"
+        ? "Your CAccessRoots request is ready for matching"
+        : "Your CAccessRoots request review is complete";
+    heading =
+      decision === "approved"
+        ? "Your request was approved"
+        : "Your request was closed after review";
+    message =
+      decision === "approved"
+        ? "A coordinator can now begin inviting an Advanced ITP Student and Mentor Interpreter. Coverage is not guaranteed until both team members confirm."
+        : "The request will not move forward to volunteer matching. Sign in to review its status.";
+    actionPath = "/requestor/requests";
+  }
+
+  if (!recipientEmail) return;
+
+  await sendWorkflowEmail({
+    to: recipientEmail,
+    subject,
+    heading,
+    message,
+    actionLabel: "Open CAccessRoots",
+    actionPath,
+  });
 }
 
 async function applyApprovalSideEffect(
